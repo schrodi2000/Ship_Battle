@@ -1,29 +1,15 @@
 package com.schrodi;
-import processing.core.PApplet;
-public class Window extends PApplet{
-    private float sizeX, sizeY,field;
-    public Window(int field, String title, int sizeX, int sizeY){
-        this.sizeX = sizeX;
-        this.sizeY = sizeY;
-        this.field = field;
-        String[] processingArgs = {title};
-        PApplet.runSketch(processingArgs, this);
+
+public class Window {
+    int mapSize;
+    public Window(int mapSize){
+        this.mapSize = mapSize;
     }
-    @Override
-    public void settings() {
-        size((int)sizeX, (int)sizeY);
-    }
-    @Override
-    public void draw() {
-        rectMode(RADIUS);
-        for(int i=1; i<=field; i++){
-            for(int m=1; m<=field; m++){
-                rect(i*(sizeX /field), m*(sizeY /field), sizeX /field, sizeY /field);
+    public void draw(){
+        for(int ix = 0; ix < mapSize; ix++){
+            for(int iy=0; iy<mapSize; iy++){
+                // TODO grafik der dinger ausgeben:)
             }
         }
-    }
-    @Override
-    public void mousePressed() {
-
     }
 }
