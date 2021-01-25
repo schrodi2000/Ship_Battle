@@ -5,16 +5,6 @@ import java.util.ArrayList;
 public class Map {
     public enum Zustand {aliveShip, deadShip, water}
 
-    public Zustand[][] getMap() {
-        for(int iy = 0; iy<mapSize; iy++){
-            for(int jx = 0; jx<mapSize; jx++){
-
-                //TODO Map aufbauen für window
-            }
-        }
-        return map;
-    }
-
     public Zustand map[][];
     ArrayList<Schiff> schiffe;
     int mapSize;
@@ -49,7 +39,22 @@ public class Map {
 
         }
         return false;
-    }
+    }//TODO Wenn auf wasser geschossen wird, soll das gespeichert werden
 
+    public Zustand[][] getMap() {
+        for(int iy = 0; iy<mapSize; iy++){
+            for(int jx = 0; jx<mapSize; jx++){
+                for(int m = 0; m<schiffe.size();m++){
+                    Schiff schiff = schiffe.get(m);
+                    if(schiff.getRichtung() == Schiff.Richtung.horizontal && schiff.getX() <= jx && schiff.getX() + schiff.getLänge() >= jx){
+                        map[iy][jx]=schiff.getTeilZustand(1);
+                    }
+                }
+
+                //TODO Map aufbauen für window
+            }
+        }
+        return map;
+    }//TODO Wenn die liste der Wasser treffer gemacht ist, soll wenn wasser an dieser stelle ist, abgefragt werden, ob da ein wassertreffer ist
 
 }
