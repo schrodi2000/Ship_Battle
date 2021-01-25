@@ -1,21 +1,24 @@
 package com.schrodi;
 
 public class Schiff {
-    public enum Richtung {horizontal, vertikal}
+    public enum Richtung {
+        horizontal,
+        vertikal
+    }
 
     private int länge;
     private Map.Zustand[] teile;
-    private int x,y;
+    private int x, y;
     private Richtung richtung;
 
 
-    public Schiff(int länge, int x, int y, Richtung richtung){
-        teile = new Map.Zustand[länge-1];
+    public Schiff(int länge, int x, int y, Richtung richtung) {
+        teile = new Map.Zustand[länge - 1];
         this.länge = länge;
         this.x = x;
         this.y = y;
         this.richtung = richtung;
-        for(int i = 0; i<länge; i++){
+        for (int i = 0; i < länge; i++) {
             teile[i] = Map.Zustand.aliveShip;
         }
     }
@@ -45,13 +48,9 @@ public class Schiff {
         return länge;
     }
 
-    public void kill(int teilNr){
+    public void kill(int teilNr) {
         teile[teilNr] = Map.Zustand.deadShip;
     }
-
-
-
-
 
 
 }
