@@ -17,21 +17,30 @@ public class Map {
     public Map(int mapSize) {
         this.mapSize = mapSize;
         map = new Zustand[mapSize][mapSize];
-        for(int i = 0;i<mapSize-1;i++){
-            for(int j=0;j<mapSize-1;j++){
-                map[i][j]=Zustand.water;
+        for (int i = 0; i < mapSize - 1; i++) {
+            for (int j = 0; j < mapSize - 1; j++) {
+                map[i][j] = Zustand.water;
             }
         }
     }
 
     public void addSchiff(int x, int y, int length, Schiff.Richtung richtung) {
-        schiffe.add(new Schiff(length, x, y, richtung));
-        //TODO Wenn gemMap weg ist muss hier ein schiff auch in der Map eingetragen werde.
+        Schiff schiff = new Schiff(length, x, y, richtung);// Erstellt ein Schiff mit den eigenschaften
+        schiffe.add(schiff);// fügt das Schiff der Liste hinzu
+        if (schiff.getRichtung() == Schiff.Richtung.horizontal) {
+            for (int i = 0; i < schiff.getLänge() - 1; i++) {// Trägt die Teile des Schiffes ein wenn es Horizontal ausgerichtet ist
+                map[x + i][y] = schiff.getTeilZustand(i);
+            }
+        } else {
+            for (int i = 0; i < schiff.getLänge() - 1; i++) {// Trägt die Teile des Schiffes ein wenn es Vertikal ausgerichtet ist
+                map[x][y + 1] = schiff.getTeilZustand(i);
+            }
+        }
     }
 
     public int removeSchiff(int x, int y) {
         //TODO Schiff muss an den Koordinaten gefunden und entfernt werden aus der schiff liste.
-        return(-1);
+        return (-1);
     }
 
     public boolean shootAt(int x, int y) {
@@ -59,23 +68,15 @@ public class Map {
     }
 
     public Zustand[][] getMap() {
-        //TODO getMap funktion weg machen so das nur die map returnt wird.
-        for (int iy = 0; iy < mapSize; iy++) {
-            for (int ix = 0; ix < mapSize; ix++) {
-                map[ix][iy] = getField(ix,iy);
-                //TODO wasser miss hinzufügen
-            }
-        }
         return map;
-    }//TODO Wenn die liste der Wasser treffer gemacht ist, soll wenn wasser an dieser stelle ist, abgefragt werden, ob da ein wassertreffer ist
+    }
 
     private Zustand getField(int x, int y) {
         for (Schiff schiff : schiffe) {
             for (int i = 0; i < schiff.getLänge() - 1; i++) {
-                if(y== schiff.getY() && x== schiff.getX()+i && schiff.getRichtung() == Schiff.Richtung.horizontal){
+                if (y == schiff.getY() && x == schiff.getX() + i && schiff.getRichtung() == Schiff.Richtung.horizontal) {
                     schiff.getTeilZustand(i);
-                }
-                else if(x== schiff.getX() && y== schiff.getY()+i && schiff.getRichtung() == Schiff.Richtung.vertikal){
+                } else if (x == schiff.getX() && y == schiff.getY() + i && schiff.getRichtung() == Schiff.Richtung.vertikal) {
                     schiff.getTeilZustand(i);
                 }
             }
