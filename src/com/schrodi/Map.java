@@ -12,43 +12,58 @@ public class Map {
 
     ArrayList<Schiff> schiffe;
     int mapSize;
+    Zustand[][] map;
 
     public Map(int mapSize) {
         this.mapSize = mapSize;
+        map = new Zustand[mapSize][mapSize];
+        for(int i = 0;i<mapSize-1;i++){
+            for(int j=0;j<mapSize-1;j++){
+                map[i][j]=Zustand.water;
+            }
+        }
     }
 
-    public void addSchiff(int x, int y, int länge, Schiff.Richtung richtung) {
-        schiffe.add(new Schiff(länge, x, y, richtung));
+    public void addSchiff(int x, int y, int length, Schiff.Richtung richtung) {
+        schiffe.add(new Schiff(length, x, y, richtung));
+        //TODO Wenn gemMap weg ist muss hier ein schiff auch in der Map eingetragen werde.
     }
 
-    public boolean schießenAuf(int x, int y) {
+    public int removeSchiff(int x, int y) {
+        //TODO Schiff muss an den Koordinaten gefunden und entfernt werden aus der schiff liste.
+        return(-1);
+    }
+
+    public boolean shootAt(int x, int y) {
         for (int i = 0; i < schiffe.size() - 1; i++) {
             Schiff schiff = schiffe.get(i);
-
             if (schiff.getRichtung() == Schiff.Richtung.horizontal) {
                 for (int j = 0; j < schiff.getLänge(); j++) {
                     if (schiff.getX() + j == x && schiff.getY() == y && schiff.getTeilZustand(0) == Zustand.aliveShip) {
+                        //TODO Schiff muss als kaputt gespeichert werden.
+                        map[x][y] = Zustand.deadShip;
                         return true;
                     }
                 }
             } else {
                 for (int j = 0; j < schiff.getLänge(); j++) {
                     if (schiff.getX() == x && schiff.getY() + j == y && schiff.getTeilZustand(0) == Zustand.aliveShip) {
+                        map[x][y] = Zustand.deadShip;
                         return true;
                     }
                 }
             }
-
         }
+        map[x][y] = Zustand.miss;
         return false;
-    }//TODO Wenn auf wasser geschossen wird, soll das gespeichert werden
+    }
 
     public Zustand[][] getMap() {
-        Zustand map[][] = new Zustand[mapSize][mapSize];
+        //TODO getMap funktion weg machen so das nur die map returnt wird.
         for (int iy = 0; iy < mapSize; iy++) {
-            for (int jx = 0; jx < mapSize; jx++) {
-                map[jx][iy] = getField(jx,iy);
-                //TODO Map aufbauen für window
+            for (int ix = 0; ix < mapSize; ix++) {
+                map[ix][iy] = getField(ix,iy);
+                //TODO wasser miss hinzufügen
             }
         }
         return map;
