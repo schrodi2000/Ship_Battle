@@ -1,9 +1,9 @@
 package com.schrodi;
 
-public class Window {
+public class Output {
     int mapSize;
 
-    public Window(int mapSize) {
+    public Output(int mapSize) {
         this.mapSize = mapSize;
     }
 
