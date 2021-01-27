@@ -37,7 +37,7 @@ public class Map {
             }
         } else {
             for (int i = 0; i < schiff.getLänge(); i++) {// Trägt die Teile des Schiffes ein wenn es Vertikal ausgerichtet ist
-                mapKarte[x][y + 1] = schiff.getTeilZustand(i);
+                mapKarte[x][y + i] = schiff.getTeilZustand(i);
             }
         }
     }
