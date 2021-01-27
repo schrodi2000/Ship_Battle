@@ -13,7 +13,7 @@ public class Schiff {
 
 
     public Schiff(int länge, int x, int y, Richtung richtung) {
-        teile = new Map.Zustand[länge - 1];
+        teile = new Map.Zustand[länge];
         this.länge = länge;
         this.x = x;
         this.y = y;
