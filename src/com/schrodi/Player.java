@@ -4,7 +4,7 @@ import jdk.jshell.spi.ExecutionControl;
 
 import java.util.ArrayList;
 
-public class Map {
+public class Player {
     public enum Zustand {
         aliveShip,
         deadShip,
@@ -17,7 +17,7 @@ public class Map {
     private Zustand[][] mapKarte;
 
 
-    public Map(int mapSize) {
+    public Player(int mapSize) {
         schiffe = new ArrayList<>();
         this.mapSize = mapSize;
         mapKarte = new Zustand[mapSize][mapSize];

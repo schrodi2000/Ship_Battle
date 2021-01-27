@@ -7,8 +7,8 @@ public class Window {
         this.mapSize = mapSize;
     }
 
-    public void draw(Map map) {
-        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    public void draw(Player player) {
+        String alphabet = "ABCDEFGHIJ";
         System.out.print("  ");
         for(int i = 1; i<=mapSize;i++){
 
@@ -19,7 +19,7 @@ public class Window {
             Character buchstabe = alphabet.charAt(iy);
             System.out.print(buchstabe + " ");
             for (int ix = 0; ix < mapSize; ix++) {
-                switch (map.getMapKarteTeil(ix,iy)){
+                switch (player.getMapKarteTeil(ix,iy)){
 
                     case aliveShip -> {
                         System.out.print('#');

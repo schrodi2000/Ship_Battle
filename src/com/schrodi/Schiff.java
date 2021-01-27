@@ -7,28 +7,28 @@ public class Schiff {
     }
 
     private int länge;
-    private Map.Zustand[] teile;
+    private Player.Zustand[] teile;
     private int x, y;
     private Richtung richtung;
 
 
     public Schiff(int länge, int x, int y, Richtung richtung) {
-        teile = new Map.Zustand[länge];
+        teile = new Player.Zustand[länge];
         this.länge = länge;
         this.x = x;
         this.y = y;
         this.richtung = richtung;
         for (int i = 0; i < länge; i++) {
-            teile[i] = Map.Zustand.aliveShip;
+            teile[i] = Player.Zustand.aliveShip;
         }
     }
 
-    public Map.Zustand getTeilZustand(int teilNr) {
-        Map.Zustand teilZustand = teile[teilNr];
+    public Player.Zustand getTeilZustand(int teilNr) {
+        Player.Zustand teilZustand = teile[teilNr];
         return teilZustand;
     }
 
-    public void setTeilZustand(int teilNr, Map.Zustand zustand) {
+    public void setTeilZustand(int teilNr, Player.Zustand zustand) {
         teile[teilNr] = zustand;
     }
 
@@ -49,7 +49,7 @@ public class Schiff {
     }
 
     public void kill(int teilNr) {
-        teile[teilNr] = Map.Zustand.deadShip;
+        teile[teilNr] = Player.Zustand.deadShip;
     }
 
 
