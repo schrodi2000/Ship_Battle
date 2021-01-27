@@ -1,5 +1,7 @@
 package com.schrodi;
 
+import jdk.jshell.spi.ExecutionControl;
+
 import java.util.ArrayList;
 
 public class Map {
@@ -10,17 +12,18 @@ public class Map {
         miss
     }
 
-    ArrayList<Schiff> schiffe;
-    int mapSize;
-    Zustand[][] map;
+    private ArrayList<Schiff> schiffe;
+    private int mapSize;
+    private Zustand[][] mapKarte;
 
 
     public Map(int mapSize) {
+        schiffe = new ArrayList<>();
         this.mapSize = mapSize;
-        map = new Zustand[mapSize][mapSize];
+        mapKarte = new Zustand[mapSize][mapSize];
         for (int i = 0; i < mapSize; i++) {
             for (int j = 0; j < mapSize; j++) {
-                map[i][j] = Zustand.water;
+                mapKarte[i][j] = Zustand.water;
             }
         }
     }
@@ -30,18 +33,17 @@ public class Map {
         schiffe.add(schiff);// fügt das Schiff der Liste hinzu
         if (schiff.getRichtung() == Schiff.Richtung.horizontal) {
             for (int i = 0; i < schiff.getLänge(); i++) {// Trägt die Teile des Schiffes ein wenn es Horizontal ausgerichtet ist
-                map[x + i][y] = schiff.getTeilZustand(i);
+                mapKarte[x + i][y] = schiff.getTeilZustand(i);
             }
         } else {
             for (int i = 0; i < schiff.getLänge(); i++) {// Trägt die Teile des Schiffes ein wenn es Vertikal ausgerichtet ist
-                map[x][y + 1] = schiff.getTeilZustand(i);
+                mapKarte[x][y + 1] = schiff.getTeilZustand(i);
             }
         }
     }
 
-    public int removeSchiff(int x, int y) {
-        //TODO Schiff muss an den Koordinaten gefunden und entfernt werden aus der schiff liste.
-        return (-1);
+    public int removeSchiff(int x, int y) throws ExecutionControl.NotImplementedException {
+        throw new ExecutionControl.NotImplementedException("remove schiff ist noch nicht vorhanden");
     }
 
     public boolean shootAt(int x, int y) {
@@ -49,7 +51,7 @@ public class Map {
             if (schiff.getRichtung() == Schiff.Richtung.horizontal) {
                 for (int teilNr = 0; teilNr < schiff.getLänge(); teilNr++) {
                     if (schiff.getX() + teilNr == x && schiff.getY() == y && schiff.getTeilZustand(teilNr) == Zustand.aliveShip) {
-                        map[x][y] = Zustand.deadShip;
+                        mapKarte[x][y] = Zustand.deadShip;
                         schiff.setTeilZustand(teilNr, Zustand.deadShip);
                         return true;
                     }
@@ -57,19 +59,19 @@ public class Map {
             } else {
                 for (int teilNr = 0; teilNr < schiff.getLänge(); teilNr++) {
                     if (schiff.getX() == x && schiff.getY() + teilNr == y && schiff.getTeilZustand(teilNr) == Zustand.aliveShip) {
-                        map[x][y] = Zustand.deadShip;
+                        mapKarte[x][y] = Zustand.deadShip;
                         schiff.setTeilZustand(teilNr, Zustand.deadShip);
                         return true;
                     }
                 }
             }
         }
-        map[x][y] = Zustand.miss;
+        mapKarte[x][y] = Zustand.miss;
         return false;
     }
 
-    public Zustand[][] getMap() {
-        return map;
+    public Zustand getMapKarteTeil(int x, int y) {
+        return mapKarte[x][y];
     }
 
     private Zustand getField(int x, int y) {
