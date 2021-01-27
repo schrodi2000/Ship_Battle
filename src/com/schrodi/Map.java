@@ -42,6 +42,17 @@ public class Map {
         }
     }
 
+    public boolean AnySchiffAlive(){
+        for(Schiff schiff : schiffe){
+            for(int i = 0;i<schiff.getLänge();i++){
+                if(schiff.getTeilZustand(i) == Zustand.aliveShip){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public int removeSchiff(int x, int y) throws ExecutionControl.NotImplementedException {
         throw new ExecutionControl.NotImplementedException("remove schiff ist noch nicht vorhanden");
     }
