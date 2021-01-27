@@ -28,8 +28,8 @@ public class Schiff {
         return teilZustand;
     }
 
-    public void setTeile(Map.Zustand[] teile) {
-        this.teile = teile;
+    public void setTeilZustand(int teilNr, Map.Zustand zustand) {
+        teile[teilNr] = zustand;
     }
 
     public int getX() {
