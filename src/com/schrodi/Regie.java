@@ -8,15 +8,14 @@ public class Output {
     }
 
     public void draw(Player player) {
-        String alphabet = "ABCDEFGHIJ";
         System.out.print("  ");
         for(int i = 1; i<=mapSize;i++){
 
-            System.out.print(i);
+            System.out.print(" " + i);
         }
         System.out.println("");
         for (int iy = 0; iy < mapSize; iy++) {
-            Character buchstabe = alphabet.charAt(iy);
+            char buchstabe = (char) ('A' + iy);
             System.out.print(buchstabe + " ");
             for (int ix = 0; ix < mapSize; ix++) {
                 switch (player.getMapKarteTeil(ix,iy)){

@@ -15,9 +15,11 @@ public class Player {
     private ArrayList<Schiff> schiffe;
     private int mapSize;
     private Zustand[][] mapKarte;
+    private boolean shipVisible;
 
 
-    public Player(int mapSize) {
+    public Player(int mapSize, boolean shipVisible) {
+        this.shipVisible = shipVisible;
         schiffe = new ArrayList<>();
         this.mapSize = mapSize;
         mapKarte = new Zustand[mapSize][mapSize];
@@ -82,6 +84,9 @@ public class Player {
     }
 
     public Zustand getMapKarteTeil(int x, int y) {
+        if(!shipVisible && mapKarte[x][y] == Zustand.aliveShip) {
+            return Zustand.water;
+        }
         return mapKarte[x][y];
     }
 
