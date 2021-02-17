@@ -2,13 +2,21 @@ package com.schrodi;
 
 import processing.core.PApplet;
 
-    public Output(int mapSize) {
-        this.mapSize = mapSize;
+public class Regie extends PApplet {
+    public enum GameState {
+        schiffeSetzen,
+        spielenGegenSpieler,
+        spielenGegenOnline,
+        spielenGegenKi,
+
+        kiGegenKi,
+        spielEnde
     }
 
-    public void draw(Player player) {
-        System.out.print("  ");
-        for(int i = 1; i<=mapSize;i++){
+    GameState spielStatus;
+    float seitenVerhaeltniss;
+    String[] verlauf = new String[10];
+    Player s,g;
 
     public Regie(Player s, Player g) {
         this.s = s;
