@@ -10,6 +10,7 @@ public class Regie extends PApplet {
         spielenGegenKi,
 
         kiGegenKi,
+        warten,
         spielEnde
     }
 
