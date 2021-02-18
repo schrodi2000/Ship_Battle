@@ -8,14 +8,12 @@ public class Regie extends PApplet {
         spielenGegenSpieler,
         spielenGegenOnline,
         spielenGegenKi,
-
         kiGegenKi,
         warten,
         spielEnde
     }
 
     public GameState spielStatus;
-    float seitenVerhaeltniss;
     String[] verlauf = new String[10];
     Player s, g;
     // Layout größen Design
@@ -33,7 +31,6 @@ public class Regie extends PApplet {
         this.g = g;
         width = 1920;
         height = 1080;
-        seitenVerhaeltniss = 16 / 9f; // das f steht dafür, dass java daraus keine int division macht sondern eine float division
         spielStatus = GameState.schiffeSetzen;
         rand = width * 0.1f;
         tileSize = (width - 2 * rand - 4 * infobereichAbstandTiles) / (mapSize*2+3);
@@ -55,13 +52,12 @@ public class Regie extends PApplet {
     }
 
     public void draw() {
-        seitenVerhaeltniss = (float)width/(float)height; // Seitenverhältnis aktualisieren
+        updateLayout();
+        background(30, 50, 50);
         drawWindow(s, g);
     }
 
-    void layoutGrößeAktualisieren() {
-        seitenVerhaeltniss = 16 / 9f; // das f steht dafür, dass java daraus keine int division macht sondern eine float division
-        spielStatus = GameState.schiffeSetzen;
+    void updateLayout() {
         rand = width * 0.1f;
         tileSize = (width - 2 * rand - 4 * infobereichAbstandTiles) / (mapSize*2+3);
         tileVerkleinerungFaktor = 0.9f;
@@ -76,7 +72,7 @@ public class Regie extends PApplet {
                 drawMap(spieler, false);
                 drawMap(gegner, true);
 
-                drawSchiffeliste();
+                drawSchiffeSetzen();
             }
         }
     }
