@@ -158,5 +158,20 @@ public class Regie extends PApplet {
     void drawSelectedShip(int selectedShip) {
         for (int i = 0; i < selectedShip; i++) {
 
+        }
+    }
+
+    boolean fieldPressed(float vonX, float vonY, float bisX, float bisY) {
+        if (mousePressed && mouseX > vonX && mouseX < bisX && mouseY > vonY && mouseY < bisY) {
+            return true;
+        }
+        return false;
+    }
+
+    float drawText(float x, float y, float size, String text) {
+        fill(255);
+        textSize(size * screenEdgeSize / 10);
+        text(text, x, y + size * screenEdgeSize / 10);
+        return y + size * screenEdgeSize / 10;
     }
 }
