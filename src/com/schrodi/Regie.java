@@ -145,7 +145,18 @@ public class Regie extends PApplet {
         return 0;
     }
 
-    void addInfo() {
+    int[] mouseOnMap(float mapPosX, float mapPosY) {
+        if(mouseX > mapPosX && mouseX < mapPosX + mapSize * tileSize && mouseY > mapPosY && mouseY < mapPosY + mapSize * tileSize) {
+            int tileOnMapX = (int)((mouseX - mapPosX) / tileSize);
+            int tileOnMapY = (int)((mouseX - mapPosY) / tileSize);
+            // ich kriege die Nummer des Teils also das wievielte es ist.
+            return new int[]{tileOnMapX, tileOnMapY};
+        }
+        return new int[]{-1, -1};
+    }
+
+    void drawSelectedShip(int selectedShip) {
+        for (int i = 0; i < selectedShip; i++) {
 
     }
 }
