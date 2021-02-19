@@ -32,11 +32,11 @@ public class Regie extends PApplet {
         width = 1920;
         height = 1080;
         spielStatus = GameState.schiffeSetzen;
-        rand = width * 0.1f;
-        tileSize = (width - 2 * rand - 4 * infobereichAbstandTiles) / (mapSize*2+3);
-        tileVerkleinerungFaktor = 0.9f;
-        infobereich = rand + tileSize * mapSize;
-        infobereichAbstandTiles = (tileSize * 0.9f - tileSize)*-1;
+        screenEdgeSize = width * 0.1f;
+        tileSize = (width - 2 * screenEdgeSize - 4 * infobereichAbstandTiles) / (mapSize * 2 + 3);
+        tileVerkleinerungFaktor = 1f;
+        infobereich = screenEdgeSize + tileSize * mapSize;
+        infobereichAbstandTiles = (tileSize * 0.9f - tileSize) * -1;
         spielfeldGegner = infobereich + 3 * tileSize + 4 * infobereichAbstandTiles;
 
         String[] processingArgs = {"Schiffe-versenken"};
