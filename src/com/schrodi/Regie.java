@@ -70,9 +70,22 @@ public class Regie extends PApplet {
         switch (spielStatus) {
             case schiffeSetzen -> {
                 drawMap(spieler, false);
+                drawShipSetting();
+                float y2 = drawText(spielfeldGegner, screenEdgeSize, 2.5f, "Steuerung:");
+                y2 = drawText(spielfeldGegner, y2, 1.5f, "Mit Linksklick kannst du Schiffe auswählen und Setzen.");
+                drawText(spielfeldGegner, y2, 1.5f, "Mit Rechtsklick kannst du das Schiff drehen.");
+            }
+            case spielenGegenSpieler -> {
+                drawMap(spieler, false);
                 drawMap(gegner, true);
-
-                drawSchiffeSetzen();
+            }
+            case spielenGegenKi -> {
+            }
+            case spielenGegenOnline -> {
+            }
+            case warten -> {
+            }
+            case spielEnde -> {
             }
         }
     }
