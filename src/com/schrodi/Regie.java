@@ -122,6 +122,27 @@ public class Regie extends PApplet {
         }
     }
 
+    boolean schiffeSetzen() {
+        int selectedShip = selectShip();
+        // TODO schiffeSetzen
+        return false;
+    }
+
+    int selectShip() {
+        //schiff 3
+        if (fieldPressed(infobereich + infobereichAbstandTiles, screenEdgeSize, infobereich + infobereichAbstandTiles + tileSize, screenEdgeSize + 3 * tileSize)) {
+            return 3;
+        }
+        //schiff 2
+        else if (fieldPressed(infobereich + 2 * infobereichAbstandTiles + tileSize, screenEdgeSize, infobereich + 2 * infobereichAbstandTiles + 2 * tileSize, screenEdgeSize + 2 * tileSize)) {
+            return 2;
+        }
+        //schiff 1
+        else if (fieldPressed(infobereich + 3 * infobereichAbstandTiles + tileSize, screenEdgeSize, infobereich + 3 * infobereichAbstandTiles + 3 * tileSize, screenEdgeSize + 1 * tileSize)) {
+            return 1;
+        }
+
+        return 0;
     }
 
     void addInfo() {
