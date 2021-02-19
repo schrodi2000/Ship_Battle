@@ -17,13 +17,13 @@ public class Regie extends PApplet {
     String[] verlauf = new String[10];
     Player s, g;
     // Layout größen Design
-    float rand;
+    float screenEdgeSize;
     float tileSize;
-    float tileVerkleinerungFaktor;
+    final float tileVerkleinerungFaktor;
     float infobereich;
     float infobereichAbstandTiles;
     float spielfeldGegner;
-    int mapSize = 3;
+    int mapSize = 7;
 
 
     public Regie(Player s, Player g) {
@@ -49,26 +49,26 @@ public class Regie extends PApplet {
 
     public void setup() {
         surface.setResizable(true);
+        noStroke();
     }
 
     public void draw() {
         updateLayout();
-        background(30, 50, 50);
+        background(100, 100, 100);
         drawWindow(s, g);
-    }
+    } // das ist die eigentliche Regie Funktion
 
     void updateLayout() {
-        rand = width * 0.1f;
-        tileSize = (width - 2 * rand - 4 * infobereichAbstandTiles) / (mapSize*2+3);
-        tileVerkleinerungFaktor = 0.9f;
-        infobereich = rand + tileSize * mapSize;
-        infobereichAbstandTiles = (tileSize * 0.9f - tileSize)*-1;
+        screenEdgeSize = width * 0.1f;
+        tileSize = (width - 2 * screenEdgeSize - 4 * infobereichAbstandTiles) / (mapSize * 2 + 3);
+        infobereich = screenEdgeSize + tileSize * mapSize;
+        infobereichAbstandTiles = (tileSize * 0.9f - tileSize) * -1;
         spielfeldGegner = infobereich + 3 * tileSize + 4 * infobereichAbstandTiles;
     }
 
     void drawWindow(Player spieler, Player gegner) {
         switch (spielStatus) {
-            case schiffeSetzen: {
+            case schiffeSetzen -> {
                 drawMap(spieler, false);
                 drawMap(gegner, true);
 
@@ -82,7 +82,7 @@ public class Regie extends PApplet {
         if (isEnemy) {
             mapPosX = spielfeldGegner;
         } else {
-            mapPosX = rand;
+            mapPosX = screenEdgeSize;
         }
         for (int iy = 0; iy < mapSize; iy++) {
             for (int jx = 0; jx < mapSize; jx++) {
@@ -92,16 +92,16 @@ public class Regie extends PApplet {
                     case deadShip -> fill(255, 0, 0);
                     case aliveShip -> fill(0, 255, 0);
                 }
-                rect(mapPosX + jx * tileSize, rand + iy * tileSize, tileSize * tileVerkleinerungFaktor, tileSize * tileVerkleinerungFaktor);
+                rect(mapPosX + jx * tileSize, screenEdgeSize + iy * tileSize, tileSize * tileVerkleinerungFaktor, tileSize * tileVerkleinerungFaktor);
             }
         }
     }
 
-    void drawSchiffeSetzen() {
-        float tilesPosY = rand;
+    void drawShipSetting() {
+        float tilesPosY = screenEdgeSize;
         float tilesPosX = infobereich + infobereichAbstandTiles;
-        fill(50, 50, 122);
-        for(int i = 3; i > 0; i--) {
+        fill(0, 100, 0);
+        for (int i = 3; i > 0; i--) {
             for (int j = 0; j < i; j++) {
                 rect(tilesPosX, tilesPosY + j * tileSize, tileSize * tileVerkleinerungFaktor, tileSize * tileVerkleinerungFaktor);
             }
