@@ -13,10 +13,10 @@ public class Player {
         miss
     }
 
-    private ArrayList<Schiff> schiffe;
-    private int mapSize;
-    private Zustand[][] mapKarte;
-    private boolean shipVisible;
+    private final ArrayList<Schiff> schiffe;
+    private final int mapSize;
+    private final Zustand[][] mapKarte;
+    private final boolean shipVisible;
 
 
     public Player(int mapSize, boolean shipVisible) {
@@ -174,19 +174,6 @@ public class Player {
             return Zustand.water;
         }
         return mapKarte[x][y];
-    }
-
-    private Zustand getField(int x, int y) {
-        for (Schiff schiff : schiffe) {
-            for (int i = 0; i < schiff.getLänge(); i++) {
-                if (y == schiff.getY() && x == schiff.getX() + i && schiff.getRichtung() == Schiff.Richtung.horizontal) {
-                    schiff.getTeilZustand(i);
-                } else if (x == schiff.getX() && y == schiff.getY() + i && schiff.getRichtung() == Schiff.Richtung.vertikal) {
-                    schiff.getTeilZustand(i);
-                }
-            }
-        }
-        return Zustand.water;
     }
 }
 
