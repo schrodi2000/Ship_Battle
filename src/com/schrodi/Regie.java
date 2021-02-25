@@ -2,18 +2,21 @@ package com.schrodi;
 
 import processing.core.PApplet;
 import processing.core.PVector;
+//--- Ich habe den ablauf gemacht und muss noch den fehler weg machen, dass wenn man falsch klickt den schuss wiedrholen muss.
+//--- Gewonnen und verloren muss auch schön gemacht werden.
+//---
+//---
 
 public class Regie extends PApplet {
     public enum GameState {
         schiffeSetzen,
-        spielenGegenSpieler,
+        spielerSchießt,
         schiffeGegnerSetzen,
-        spielenGegenOnline,
-        spielenGegenKi,
-        kiGegenKi,
-        warten,
-        spielEnde
+        gegnerSchießt,
+        gewonnen,
+        verloren
     }
+
     public enum GameMode {
         spielenGegenSpieler,
         spielenGegenOnline,
@@ -22,7 +25,7 @@ public class Regie extends PApplet {
 
     }
 
-    public  GameMode gameMode;
+    public GameMode gameMode;
     public GameState spielStatus;
     // Layout größen Design
     float screenEdgeSize;
@@ -63,7 +66,7 @@ public class Regie extends PApplet {
         String[] processingArgs = {"Schiffe-versenken"};
         PApplet.runSketch(processingArgs, this);
 
-        gameMode = GameMode.spielenGegenSpieler;
+        gameMode = GameMode.spielenGegenKi;
     }
 
     public void settings() {
@@ -99,11 +102,12 @@ public class Regie extends PApplet {
                 y2 = drawText(spielfeldGegner, y2, 1.5f, "Mit Rechtsklick kannst du das Schiff drehen.");
                 drawText(spielfeldGegner, y2, 1.5f, "Du kannst 2:Dreier, 3:Zweier und 4:Einer setzen.");
                 drawSchiffeSetzen(spieler, false);
-                if(einerSchiffe == 0 && zweierSchiffe == 0 && dreierSchiffe == 0 && gameMode != null){
+                if (einerSchiffe == 0 && zweierSchiffe == 0 && dreierSchiffe == 0 && gameMode != null) {
                     einerSchiffe = -1;
                     zweierSchiffe = -1;
                     dreierSchiffe = -1;
-                    switch (gameMode){
+                    switch (gameMode) {
+                        case spielenGegenKi:
                         case spielenGegenSpieler: {
                             spielStatus = GameState.schiffeGegnerSetzen;
                             break;
@@ -113,27 +117,85 @@ public class Regie extends PApplet {
                 break;
             }
             case schiffeGegnerSetzen: {
-                if(einerSchiffe == -1 && zweierSchiffe == -1 && dreierSchiffe == -1){
-                    einerSchiffe = 4;
-                    zweierSchiffe = 3;
-                    dreierSchiffe = 2;
+                switch (gameMode) {
+                    case spielenGegenSpieler: {
+                        if (einerSchiffe == -1 && zweierSchiffe == -1 && dreierSchiffe == -1) {
+                            einerSchiffe = 3;
+                            zweierSchiffe = 2;
+                            dreierSchiffe = 2;
+                        }
+                        drawMap(gegner, true, true);
+                        drawShipSelect();
+                        drawSchiffeSetzen(gegner, true);
+                        if (einerSchiffe == 0 && zweierSchiffe == 0 && dreierSchiffe == 0) {
+                            switch (gameMode) {
+                                case spielenGegenSpieler: {
+                                    if (Math.random() < 0.5) {
+                                        spielStatus = GameState.spielerSchießt;
+                                    } else {
+                                        spielStatus = GameState.gegnerSchießt;
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                    case spielenGegenKi: {
+                        gegner.randomAddShips(2, 2, 3);
+                        if (Math.random() < 0.5) {
+                            spielStatus = GameState.spielerSchießt;
+                        } else {
+                            spielStatus = GameState.gegnerSchießt;
+                        }
+                        break;
+                    }
                 }
-                drawMap(gegner, true, true);
-                drawShipSelect();
-                drawSchiffeSetzen(gegner, true);
-                if(einerSchiffe == 0 && zweierSchiffe == 0 && dreierSchiffe == 0){
-                    switch (gameMode){
-                        case spielenGegenSpieler: {
-                            spielStatus = GameState.spielenGegenSpieler;
+                break;
+            }
+            case spielerSchießt: {
+                drawMap(spieler, false, true);
+                drawMap(gegner, true, false);
+
+                if (mousePosOnMap(spielfeldGegner, screenEdgeSize).x != -1) {
+                    int x = (int) mousePosOnMap(spielfeldGegner, screenEdgeSize).x;
+                    int y = (int) mousePosOnMap(spielfeldGegner, screenEdgeSize).y;
+                    if (mouseLeftClick) {
+                        gegner.shootAt(x, y);
+                        spielStatus = GameState.gegnerSchießt;
+                        if (!gegner.AnySchiffAlive()) {
+                            spielStatus = GameState.gewonnen;
                         }
                     }
                 }
                 break;
             }
-            case spielenGegenSpieler: {
-                drawMap(spieler, false, true);
-                drawMap(gegner, true, false);
-                // TODO hier bin ich nun und muss das machen, das man auf das andere feld schießen kann und schüsse des anderen bei sich eintagen kann.(man sagt sich gegenseitig wo hingeschossen wurde.)
+            case gegnerSchießt: {
+                switch (gameMode) {
+                    case spielenGegenKi: {
+                        drawMap(spieler, false, true);
+                        drawMap(gegner, true, false);
+                        if (mouseLeftClick) {
+                            break;
+                        }
+                        int x = (int) gegner.ki().x;
+                        int y = (int) gegner.ki().y;
+                        spieler.shootAt(x, y);
+                        spielStatus = GameState.spielerSchießt;
+                        if (!spieler.AnySchiffAlive()) {
+                            spielStatus = GameState.verloren;
+                        }
+                        break;
+                    }
+                }
+                break;
+            }
+            case gewonnen: {
+                System.out.println("Jea!");
+                break;
+            }
+            case verloren: {
+                System.out.println("Noo :(");
                 break;
             }
         }
@@ -151,13 +213,17 @@ public class Regie extends PApplet {
         for (int iy = 0; iy < mapSize; iy++) {
             for (int jx = 0; jx < mapSize; jx++) {
                 switch (player.getMapKarteTeil(jx, iy)) {
-                    case water: fill(0, 0, 255);
+                    case water:
+                        fill(0, 0, 255);
                         break;
-                    case miss: fill(122, 122, 255);
+                    case miss:
+                        fill(122, 122, 255);
                         break;
-                    case deadShip: fill(255, 0, 0);
+                    case deadShip:
+                        fill(255, 0, 0);
                         break;
-                    case aliveShip: fill(0, 255, 0);
+                    case aliveShip:
+                        fill(0, 255, 0);
                         break;
                 }
                 rect(mapPosX + jx * tileSize, screenEdgeSize + iy * tileSize, tileSize * tileVerkleinerungFaktor, tileSize * tileVerkleinerungFaktor);
@@ -195,11 +261,14 @@ public class Regie extends PApplet {
                 if (mouseLeftClick && schiffX > -1 && schiffY > -1) {
                     if (player.addSchiff(schiffX, schiffY, selectedShipLength, selectedShipDirection)) {
                         switch (selectedShipLength) {
-                            case 1: einerSchiffe--;
+                            case 1:
+                                einerSchiffe--;
                                 break;
-                            case 2: zweierSchiffe--;
+                            case 2:
+                                zweierSchiffe--;
                                 break;
-                            case 3: dreierSchiffe--;
+                            case 3:
+                                dreierSchiffe--;
                                 break;
                         }
                     }
@@ -223,7 +292,7 @@ public class Regie extends PApplet {
         //schiff 1
         else if (fieldPressed(infobereich + 3 * infobereichAbstandTiles + tileSize, screenEdgeSize, infobereich + 3 * infobereichAbstandTiles + 3 * tileSize, screenEdgeSize + 1 * tileSize) && einerSchiffe > 0) {
             return 1;
-        } else if(einerSchiffe == 0 && selectedShipLength == 1 || zweierSchiffe == 0 && selectedShipLength == 2 || dreierSchiffe == 0 && selectedShipLength == 3){
+        } else if (einerSchiffe == 0 && selectedShipLength == 1 || zweierSchiffe == 0 && selectedShipLength == 2 || dreierSchiffe == 0 && selectedShipLength == 3) {
             return 0;
         }
 
