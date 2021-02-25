@@ -1,5 +1,7 @@
 package com.schrodi;
 
+import processing.core.PVector;
+
 import java.util.Random;
 import java.util.ArrayList;
 
@@ -126,6 +128,12 @@ public class Player {
         return false;
     }
 
+    public PVector ki() {
+        int x = (int) (Math.random() * mapSize);
+        int y = (int) (Math.random() * mapSize);
+        return (new PVector(x, y));
+    }
+
     public int removeSchiff(int x, int y) {
         return -1; // TODO Schiffe müssen aus der Schiffsliste entfernt werden können, wenn sie zerstört worden sind.
     }
@@ -150,7 +158,9 @@ public class Player {
                 }
             }
         }
-        mapKarte[x][y] = Zustand.miss;
+        if (mapKarte[x][y] == Zustand.water) {
+            mapKarte[x][y] = Zustand.miss;
+        }
         return false;
     }
 
