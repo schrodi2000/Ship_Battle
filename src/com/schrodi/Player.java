@@ -1,7 +1,5 @@
 package com.schrodi;
 
-import jdk.jshell.spi.ExecutionControl;
-
 import java.util.Random;
 import java.util.ArrayList;
 
@@ -16,11 +14,11 @@ public class Player {
     private final ArrayList<Schiff> schiffe;
     private final int mapSize;
     private final Zustand[][] mapKarte;
-    private final boolean shipVisible;
+    private boolean shipVisible;
 
 
-    public Player(int mapSize, boolean shipVisible) {
-        this.shipVisible = shipVisible;
+    public Player(int mapSize, boolean shipsVisible) {
+        this.shipVisible = shipsVisible;
         schiffe = new ArrayList<>();
         this.mapSize = mapSize;
         mapKarte = new Zustand[mapSize][mapSize];
@@ -29,6 +27,14 @@ public class Player {
                 mapKarte[ix][jy] = Zustand.water;
             }
         }
+    }
+
+    public void setShipVisible(boolean shipsVisible) {
+        this.shipVisible = shipsVisible;
+    }
+
+    public boolean isShipVisible() {
+        return shipVisible;
     }
 
     public boolean addSchiff(int x, int y, int length, Schiff.Richtung richtung) {
@@ -54,7 +60,7 @@ public class Player {
         try {
             for (int i = 0; i < schiff.getLänge(); i++) {
                 if (schiff.getRichtung() == Schiff.Richtung.horizontal) {//Horizontale Schiffe
-                    if (mapKarte[schiff.getX()][schiff.getY() + i] == Zustand.aliveShip) {// schiff darf nicht auf anderes schiff gesetzt werden
+                    if (mapKarte[schiff.getX() + i][schiff.getY()] == Zustand.aliveShip) {// schiff darf nicht auf anderes schiff gesetzt werden
                         return false;
                     }
                     if (schiff.getX() > 0) {
@@ -120,8 +126,8 @@ public class Player {
         return false;
     }
 
-    public int removeSchiff(int x, int y) throws ExecutionControl.NotImplementedException {
-        throw new ExecutionControl.NotImplementedException("remove schiff ist noch nicht vorhanden");
+    public int removeSchiff(int x, int y) {
+        return -1; // TODO Schiffe müssen aus der Schiffsliste entfernt werden können, wenn sie zerstört worden sind.
     }
 
     public boolean shootAt(int x, int y) {
