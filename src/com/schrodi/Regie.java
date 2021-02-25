@@ -7,15 +7,23 @@ public class Regie extends PApplet {
     public enum GameState {
         schiffeSetzen,
         spielenGegenSpieler,
+        schiffeGegnerSetzen,
         spielenGegenOnline,
         spielenGegenKi,
         kiGegenKi,
         warten,
         spielEnde
     }
+    public enum GameMode {
+        spielenGegenSpieler,
+        spielenGegenOnline,
+        spielenGegenKi,
+        kiGegenKi,
 
+    }
+
+    public  GameMode gameMode;
     public GameState spielStatus;
-    String[] verlauf = new String[10];
     // Layout größen Design
     float screenEdgeSize;
     float tileSize;
@@ -27,14 +35,15 @@ public class Regie extends PApplet {
     int dreierSchiffe;
     int zweierSchiffe;
     int einerSchiffe;
-    int selectedShipLength = 0;
+    int selectedShipLength;
     boolean mouseLeftClick;
-    Schiff.Richtung selectedShipDirection = Schiff.Richtung.vertikal;
+    Schiff.Richtung selectedShipDirection;
     Player spieler;
     Player gegner;
 
 
     public Regie() {
+        selectedShipLength = 0;
         mapSize = 7;
         spieler = new Player(mapSize, true);
         gegner = new Player(mapSize, false);
@@ -43,6 +52,7 @@ public class Regie extends PApplet {
         einerSchiffe = 4;
         width = 1920;
         height = 1080;
+        selectedShipDirection = Schiff.Richtung.vertikal;
         spielStatus = GameState.schiffeSetzen;
         screenEdgeSize = width * 0.1f;
         tileSize = (width - 2 * screenEdgeSize - 4 * infobereichAbstandTiles) / (mapSize * 2 + 3);
@@ -53,6 +63,7 @@ public class Regie extends PApplet {
         String[] processingArgs = {"Schiffe-versenken"};
         PApplet.runSketch(processingArgs, this);
 
+        gameMode = GameMode.spielenGegenSpieler;
     }
 
     public void settings() {
@@ -67,7 +78,7 @@ public class Regie extends PApplet {
     public void draw() {
         updateLayout();
         background(100, 100, 100);
-        drawWindow(spieler, gegner);
+        spielAblauf(spieler, gegner);
     } // das ist die eigentliche Regie Funktion
 
     void updateLayout() {
@@ -78,52 +89,84 @@ public class Regie extends PApplet {
         spielfeldGegner = infobereich + 3 * tileSize + 4 * infobereichAbstandTiles;
     }
 
-    void drawWindow(Player spieler, Player gegner) {
+    void spielAblauf(Player spieler, Player gegner) {
         switch (spielStatus) {
-            case schiffeSetzen -> {
-                drawMap(spieler, false);
-                drawShipSetting();
+            case schiffeSetzen: {
+                drawMap(spieler, false, true);
+                drawShipSelect();
                 float y2 = drawText(spielfeldGegner, screenEdgeSize, 2.5f, "Steuerung:");
                 y2 = drawText(spielfeldGegner, y2, 1.5f, "Mit Linksklick kannst du Schiffe auswählen und Setzen.");
-                drawText(spielfeldGegner, y2, 1.5f, "Mit Rechtsklick kannst du das Schiff drehen.");
-                schiffeSetzen();
+                y2 = drawText(spielfeldGegner, y2, 1.5f, "Mit Rechtsklick kannst du das Schiff drehen.");
+                drawText(spielfeldGegner, y2, 1.5f, "Du kannst 2:Dreier, 3:Zweier und 4:Einer setzen.");
+                drawSchiffeSetzen(spieler, false);
+                if(einerSchiffe == 0 && zweierSchiffe == 0 && dreierSchiffe == 0 && gameMode != null){
+                    einerSchiffe = -1;
+                    zweierSchiffe = -1;
+                    dreierSchiffe = -1;
+                    switch (gameMode){
+                        case spielenGegenSpieler: {
+                            spielStatus = GameState.schiffeGegnerSetzen;
+                            break;
+                        }
+                    }
+                }
+                break;
             }
-            case spielenGegenSpieler -> {
-                drawMap(spieler, false);
-                drawMap(gegner, true);
+            case schiffeGegnerSetzen: {
+                if(einerSchiffe == -1 && zweierSchiffe == -1 && dreierSchiffe == -1){
+                    einerSchiffe = 4;
+                    zweierSchiffe = 3;
+                    dreierSchiffe = 2;
+                }
+                drawMap(gegner, true, true);
+                drawShipSelect();
+                drawSchiffeSetzen(gegner, true);
+                if(einerSchiffe == 0 && zweierSchiffe == 0 && dreierSchiffe == 0){
+                    switch (gameMode){
+                        case spielenGegenSpieler: {
+                            spielStatus = GameState.spielenGegenSpieler;
+                        }
+                    }
+                }
+                break;
             }
-            case spielenGegenKi -> {
-            }
-            case spielenGegenOnline -> {
-            }
-            case warten -> {
-            }
-            case spielEnde -> {
+            case spielenGegenSpieler: {
+                drawMap(spieler, false, true);
+                drawMap(gegner, true, false);
+                // TODO hier bin ich nun und muss das machen, das man auf das andere feld schießen kann und schüsse des anderen bei sich eintagen kann.(man sagt sich gegenseitig wo hingeschossen wurde.)
+                break;
             }
         }
     }
 
-    void drawMap(Player player, Boolean isEnemy) {
+    void drawMap(Player player, Boolean isEnemy, boolean shipsVisible) {
         float mapPosX;
         if (isEnemy) {
             mapPosX = spielfeldGegner;
         } else {
             mapPosX = screenEdgeSize;
         }
+        boolean visible = player.isShipVisible();
+        player.setShipVisible(shipsVisible);
         for (int iy = 0; iy < mapSize; iy++) {
             for (int jx = 0; jx < mapSize; jx++) {
                 switch (player.getMapKarteTeil(jx, iy)) {
-                    case water -> fill(0, 0, 255);
-                    case miss -> fill(122, 122, 255);
-                    case deadShip -> fill(255, 0, 0);
-                    case aliveShip -> fill(0, 255, 0);
+                    case water: fill(0, 0, 255);
+                        break;
+                    case miss: fill(122, 122, 255);
+                        break;
+                    case deadShip: fill(255, 0, 0);
+                        break;
+                    case aliveShip: fill(0, 255, 0);
+                        break;
                 }
                 rect(mapPosX + jx * tileSize, screenEdgeSize + iy * tileSize, tileSize * tileVerkleinerungFaktor, tileSize * tileVerkleinerungFaktor);
             }
         }
+        player.setShipVisible(visible);
     }
 
-    void drawShipSetting() {
+    void drawShipSelect() {
         float tilesPosY = screenEdgeSize;
         float tilesPosX = infobereich + infobereichAbstandTiles;
         fill(0, 100, 0);
@@ -135,20 +178,29 @@ public class Regie extends PApplet {
         }
     }
 
-    boolean schiffeSetzen() {
+    boolean drawSchiffeSetzen(Player player, boolean enemy) {
+        float mapPosX;
+        if (enemy) {
+            mapPosX = spielfeldGegner;
+        } else {
+            mapPosX = screenEdgeSize;
+        }
         if (dreierSchiffe > 0 || zweierSchiffe > 0 || einerSchiffe > 0) {
             selectedShipLength = selectShip();
             if (selectedShipLength > -1) {
 
-                drawSelectedShip(selectedShipLength, screenEdgeSize, screenEdgeSize);
-                int schiffX = (int) mousePosOnMap(screenEdgeSize, screenEdgeSize).x;
-                int schiffY = (int) mousePosOnMap(screenEdgeSize, screenEdgeSize).y;
+                drawSelectedShip(selectedShipLength, mapPosX, screenEdgeSize);
+                int schiffX = (int) mousePosOnMap(mapPosX, screenEdgeSize).x;
+                int schiffY = (int) mousePosOnMap(mapPosX, screenEdgeSize).y;
                 if (mouseLeftClick && schiffX > -1 && schiffY > -1) {
-                    if (spieler.addSchiff(schiffX, schiffY, selectedShipLength, selectedShipDirection)) {
+                    if (player.addSchiff(schiffX, schiffY, selectedShipLength, selectedShipDirection)) {
                         switch (selectedShipLength) {
-                            case 1 -> einerSchiffe--;
-                            case 2 -> zweierSchiffe--;
-                            case 3 -> dreierSchiffe--;
+                            case 1: einerSchiffe--;
+                                break;
+                            case 2: zweierSchiffe--;
+                                break;
+                            case 3: dreierSchiffe--;
+                                break;
                         }
                     }
                 }
@@ -210,11 +262,7 @@ public class Regie extends PApplet {
     }
 
     boolean fieldPressed(float vonX, float vonY, float bisX, float bisY) {
-        // TODO mousePressed und mouseReleased funktionen hinzufügen welche den klick speichern.
-        if (mouseLeftClick && mouseX > vonX && mouseX < bisX && mouseY > vonY && mouseY < bisY) {
-            return true;
-        }
-        return false;
+        return mouseLeftClick && mouseX > vonX && mouseX < bisX && mouseY > vonY && mouseY < bisY;
     }
 
     float drawText(float x, float y, float size, String text) {
