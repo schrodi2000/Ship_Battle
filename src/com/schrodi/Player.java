@@ -160,6 +160,7 @@ public class Player {
         }
         if (mapKarte[x][y] == Zustand.water) {
             mapKarte[x][y] = Zustand.miss;
+            return true;
         }
         return false;
     }

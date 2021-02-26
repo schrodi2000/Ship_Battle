@@ -161,10 +161,11 @@ public class Regie extends PApplet {
                     int x = (int) mousePosOnMap(spielfeldGegner, screenEdgeSize).x;
                     int y = (int) mousePosOnMap(spielfeldGegner, screenEdgeSize).y;
                     if (mouseLeftClick) {
-                        gegner.shootAt(x, y);
-                        spielStatus = GameState.gegnerSchießt;
-                        if (!gegner.AnySchiffAlive()) {
-                            spielStatus = GameState.gewonnen;
+                        if (gegner.shootAt(x, y)) {
+                            spielStatus = GameState.gegnerSchießt;
+                            if (!gegner.AnySchiffAlive()) {
+                                spielStatus = GameState.gewonnen;
+                            }
                         }
                     }
                 }
@@ -180,10 +181,11 @@ public class Regie extends PApplet {
                         }
                         int x = (int) gegner.ki().x;
                         int y = (int) gegner.ki().y;
-                        spieler.shootAt(x, y);
-                        spielStatus = GameState.spielerSchießt;
-                        if (!spieler.AnySchiffAlive()) {
-                            spielStatus = GameState.verloren;
+                        if (spieler.shootAt(x, y)) {
+                            spielStatus = GameState.spielerSchießt;
+                            if (!spieler.AnySchiffAlive()) {
+                                spielStatus = GameState.verloren;
+                            }
                         }
                         break;
                     }
@@ -191,11 +193,11 @@ public class Regie extends PApplet {
                 break;
             }
             case gewonnen: {
-                System.out.println("Jea!");
+                drawText(screenEdgeSize, screenEdgeSize, 10, "Gewonnen");
                 break;
             }
             case verloren: {
-                System.out.println("Noo :(");
+                drawText(screenEdgeSize, screenEdgeSize, 10, "Verloren");
                 break;
             }
         }
