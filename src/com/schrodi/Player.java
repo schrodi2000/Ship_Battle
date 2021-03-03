@@ -117,15 +117,15 @@ public class Player {
         return true;
     }
 
-    public boolean AnySchiffAlive() {
+    public boolean noSchiffAlive() {
         for (Schiff schiff : schiffe) {
             for (int i = 0; i < schiff.getLänge(); i++) {
                 if (schiff.getTeilZustand(i) == Zustand.aliveShip) {
-                    return true;
+                    return false;
                 }
             }
         }
-        return false;
+        return true;
     }
 
     public PVector ki() {
@@ -134,8 +134,16 @@ public class Player {
         return (new PVector(x, y));
     }
 
-    public int removeSchiff(int x, int y) {
-        return -1; // TODO Schiffe müssen aus der Schiffsliste entfernt werden können, wenn sie zerstört worden sind.
+    public void removeSchiff(Schiff schiff) {
+        boolean destroyed = true;
+        for (int i = 0; i < schiff.getLänge(); i++) {
+            if (schiff.getTeilZustand(i) == Zustand.aliveShip) {
+                destroyed = false;
+            }
+        }
+        if (destroyed) {
+            schiffe.remove(schiff);
+        }
     }
 
     public boolean shootAt(int x, int y) {
@@ -145,6 +153,7 @@ public class Player {
                     if (schiff.getX() + teilNr == x && schiff.getY() == y && schiff.getTeilZustand(teilNr) == Zustand.aliveShip) {
                         mapKarte[x][y] = Zustand.deadShip;
                         schiff.setTeilZustand(teilNr, Zustand.deadShip);
+                        removeSchiff(schiff);
                         return true;
                     }
                 }
@@ -153,6 +162,7 @@ public class Player {
                     if (schiff.getX() == x && schiff.getY() + teilNr == y && schiff.getTeilZustand(teilNr) == Zustand.aliveShip) {
                         mapKarte[x][y] = Zustand.deadShip;
                         schiff.setTeilZustand(teilNr, Zustand.deadShip);
+                        removeSchiff(schiff);
                         return true;
                     }
                 }
@@ -165,12 +175,10 @@ public class Player {
         return false;
     }
 
-    public boolean randomAddShips(int dreier, int zweier, int einer) {
+    public void randomAddShips(int dreier, int zweier, int einer) {
         Random random = new Random();
         int versuche = 0;
-        int i = 0;
         do {
-            i++;
             int x = random.nextInt(mapSize);
             int y = random.nextInt(mapSize);
             Schiff.Richtung richtung = (random.nextInt(2) == 1) ? Schiff.Richtung.horizontal : Schiff.Richtung.vertikal;
@@ -183,7 +191,6 @@ public class Player {
             }
             versuche++;
         } while ((dreier > 0 || zweier > 0 || einer > 0) && versuche < 1000);
-        return dreier == 0 && zweier == 0 && einer == 0;
     }
 
     public Zustand getMapKarteTeil(int x, int y) {
