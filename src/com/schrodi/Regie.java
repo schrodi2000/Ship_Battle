@@ -2,17 +2,13 @@ package com.schrodi;
 
 import processing.core.PApplet;
 import processing.core.PVector;
-//--- Ich habe den ablauf gemacht und muss noch den fehler weg machen, dass wenn man falsch klickt den schuss wiedrholen muss.
-//--- Gewonnen und verloren muss auch schön gemacht werden.
-//---
-//---
 
 public class Regie extends PApplet {
     public enum GameState {
         schiffeSetzen,
-        spielerSchießt,
+        spielerShoots,
         schiffeGegnerSetzen,
-        gegnerSchießt,
+        gegnerShoots,
         gewonnen,
         verloren
     }
@@ -128,15 +124,10 @@ public class Regie extends PApplet {
                         drawShipSelect();
                         drawSchiffeSetzen(gegner, true);
                         if (einerSchiffe == 0 && zweierSchiffe == 0 && dreierSchiffe == 0) {
-                            switch (gameMode) {
-                                case spielenGegenSpieler: {
-                                    if (Math.random() < 0.5) {
-                                        spielStatus = GameState.spielerSchießt;
-                                    } else {
-                                        spielStatus = GameState.gegnerSchießt;
-                                    }
-                                }
-                                break;
+                            if (Math.random() < 0.5) {
+                                spielStatus = GameState.spielerShoots;
+                            } else {
+                                spielStatus = GameState.gegnerShoots;
                             }
                         }
                         break;
@@ -144,16 +135,16 @@ public class Regie extends PApplet {
                     case spielenGegenKi: {
                         gegner.randomAddShips(2, 2, 3);
                         if (Math.random() < 0.5) {
-                            spielStatus = GameState.spielerSchießt;
+                            spielStatus = GameState.spielerShoots;
                         } else {
-                            spielStatus = GameState.gegnerSchießt;
+                            spielStatus = GameState.gegnerShoots;
                         }
                         break;
                     }
                 }
                 break;
             }
-            case spielerSchießt: {
+            case spielerShoots: {
                 drawMap(spieler, false, true);
                 drawMap(gegner, true, false);
 
@@ -162,7 +153,7 @@ public class Regie extends PApplet {
                     int y = (int) mousePosOnMap(spielfeldGegner, screenEdgeSize).y;
                     if (mouseLeftClick) {
                         if (gegner.shootAt(x, y)) {
-                            spielStatus = GameState.gegnerSchist;
+                            spielStatus = GameState.gegnerShoots;
                             if (gegner.noSchiffAlive()) {
                                 spielStatus = GameState.gewonnen;
                             }
@@ -171,7 +162,7 @@ public class Regie extends PApplet {
                 }
                 break;
             }
-            case gegnerSchießt: {
+            case gegnerShoots: {
                 switch (gameMode) {
                     case spielenGegenKi: {
                         drawMap(spieler, false, true);
@@ -182,8 +173,8 @@ public class Regie extends PApplet {
                         int x = (int) gegner.ki().x;
                         int y = (int) gegner.ki().y;
                         if (spieler.shootAt(x, y)) {
-                            spielStatus = GameState.spielerSchießt;
-                            if (!spieler.AnySchiffAlive()) {
+                            spielStatus = GameState.spielerShoots;
+                            if (spieler.noSchiffAlive()) {
                                 spielStatus = GameState.verloren;
                             }
                         }
@@ -246,7 +237,7 @@ public class Regie extends PApplet {
         }
     }
 
-    boolean drawSchiffeSetzen(Player player, boolean enemy) {
+    void drawSchiffeSetzen(Player player, boolean enemy) {
         float mapPosX;
         if (enemy) {
             mapPosX = spielfeldGegner;
@@ -276,9 +267,6 @@ public class Regie extends PApplet {
                     }
                 }
             }
-            return false;
-        } else {
-            return true;
         }
     }
 

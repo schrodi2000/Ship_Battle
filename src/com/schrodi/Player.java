@@ -13,7 +13,7 @@ public class Player {
         miss
     }
 
-    private final ArrayList<Schiff> schiffe;
+    public final ArrayList<Schiff> schiffe;
     private final int mapSize;
     private final Zustand[][] mapKarte;
     private boolean shipVisible;
