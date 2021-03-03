@@ -162,8 +162,8 @@ public class Regie extends PApplet {
                     int y = (int) mousePosOnMap(spielfeldGegner, screenEdgeSize).y;
                     if (mouseLeftClick) {
                         if (gegner.shootAt(x, y)) {
-                            spielStatus = GameState.gegnerSchießt;
-                            if (!gegner.AnySchiffAlive()) {
+                            spielStatus = GameState.gegnerSchist;
+                            if (gegner.noSchiffAlive()) {
                                 spielStatus = GameState.gewonnen;
                             }
                         }
