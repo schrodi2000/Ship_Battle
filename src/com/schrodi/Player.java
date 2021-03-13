@@ -18,6 +18,19 @@ public class Player {
     private final Zustand[][] mapKarte;
     private boolean shipVisible;
 
+    public Zustand[][] getOfficialMapKarte() {
+        Zustand[][] karte = new Zustand[mapSize][mapSize];
+        for (int y = 0; y < mapSize; y++) {
+            for (int x = 0; x < mapSize; x++) {
+                if (mapKarte[x][y] == Zustand.aliveShip) {
+                    karte[x][y] = Zustand.water;
+                } else {
+                    karte[x][y] = mapKarte[x][y];
+                }
+            }
+        }
+        return karte;
+    }
 
     public Player(int mapSize, boolean shipsVisible) {
         this.shipVisible = shipsVisible;
@@ -52,10 +65,10 @@ public class Player {
                 }
             }
             schiffe.add(schiff);// fügt das Schiff der Liste hinzu
+            return true;
         } else {
             return false;
         }
-        return true;
     }
 
     boolean addAbleSchiff(Schiff schiff) {
@@ -128,10 +141,43 @@ public class Player {
         return true;
     }
 
-    public PVector ki() {
-        int x = (int) (Math.random() * mapSize);
-        int y = (int) (Math.random() * mapSize);
-        return (new PVector(x, y));
+    public PVector ki(Zustand[][] map, boolean hitLast) {
+        PVector shootAt = new PVector(-1, -1);
+        for (int y = 0; y < map.length; y++) {
+            for (int x = 0; x < map.length; x++) {
+                if (map[x][y] == Zustand.deadShip) {
+                    Random t = new Random();
+                    try {
+                        switch (t.nextInt(3)) {
+                            case 0:
+                                if (map[x][y - 1] == Zustand.water) {
+                                    shootAt = new PVector(x, y - 1);
+                                }
+                                break;
+                            case 1:
+                                if (map[x - 1][y] == Zustand.water) {
+                                    shootAt = new PVector(x - 1, y);
+                                }
+                                break;
+                            case 2:
+                                if (map[x][y + 1] == Zustand.water) {
+                                    shootAt = new PVector(x, y + 1);
+                                }
+                                break;
+                            case 3:
+                                if (map[x + 1][y] == Zustand.water) {
+                                    shootAt = new PVector(x + 1, y);
+                                }
+                                break;
+                        }
+                    }catch (Exception e){}
+                }
+            }
+        }
+        if (shootAt.x == -1) {
+            shootAt = new PVector((int) (Math.random() * mapSize), (int) (Math.random() * mapSize));
+        }
+        return shootAt;
     }
 
     public void removeSchiff(Schiff schiff) {
@@ -177,20 +223,33 @@ public class Player {
 
     public void randomAddShips(int dreier, int zweier, int einer) {
         Random random = new Random();
-        int versuche = 0;
+        int x;
+        int y;
+        int i = 0;
         do {
-            int x = random.nextInt(mapSize);
-            int y = random.nextInt(mapSize);
+            x = random.nextInt(mapSize);
+            y = random.nextInt(mapSize);
             Schiff.Richtung richtung = (random.nextInt(2) == 1) ? Schiff.Richtung.horizontal : Schiff.Richtung.vertikal;
-            if (addSchiff(x, y, 3, richtung) && dreier > 0) {
-                dreier--;
-            } else if (addSchiff(x, y, 2, richtung) && zweier > 0) {
-                zweier--;
-            } else if (addSchiff(x, y, 1, richtung) && einer > 0) {
-                einer--;
+            if (dreier > 0) {
+                if(addSchiff(x, y, 3, richtung)) {
+                    dreier--;
+                }
             }
-            versuche++;
-        } while ((dreier > 0 || zweier > 0 || einer > 0) && versuche < 1000);
+            x = random.nextInt(mapSize);
+            y = random.nextInt(mapSize);
+            if (zweier > 0) {
+                if(addSchiff(x, y, 2, richtung)) {
+                    zweier--;
+                }
+            }
+            x = random.nextInt(mapSize);
+            y = random.nextInt(mapSize);
+            if (einer > 0) {
+                if(addSchiff(x, y, 1, richtung)) {
+                    einer--;
+                }
+            }
+        } while (dreier > 0 || zweier > 0 || einer > 0);
     }
 
     public Zustand getMapKarteTeil(int x, int y) {

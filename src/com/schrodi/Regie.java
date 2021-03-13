@@ -39,6 +39,8 @@ public class Regie extends PApplet {
     Schiff.Richtung selectedShipDirection;
     Player spieler;
     Player gegner;
+    char pressedKey = 0;
+    boolean correctShoot = false;
 
 
     public Regie() {
@@ -47,8 +49,8 @@ public class Regie extends PApplet {
         spieler = new Player(mapSize, true);
         gegner = new Player(mapSize, false);
         dreierSchiffe = 2;
-        zweierSchiffe = 3;
-        einerSchiffe = 4;
+        zweierSchiffe = 2;
+        einerSchiffe = 3;
         width = 1920;
         height = 1080;
         selectedShipDirection = Schiff.Richtung.vertikal;
@@ -93,19 +95,22 @@ public class Regie extends PApplet {
             case schiffeSetzen: {
                 drawMap(spieler, false, true);
                 drawShipSelect();
-                float y2 = drawText(spielfeldGegner, screenEdgeSize, 2.5f, "Steuerung:");
-                y2 = drawText(spielfeldGegner, y2, 1.5f, "Mit Linksklick kannst du Schiffe auswählen und Setzen.");
-                y2 = drawText(spielfeldGegner, y2, 1.5f, "Mit Rechtsklick kannst du das Schiff drehen.");
-                drawText(spielfeldGegner, y2, 1.5f, "Du kannst 2:Dreier, 3:Zweier und 4:Einer setzen.");
+                float textAbstandY = drawText(spielfeldGegner, screenEdgeSize, 2.5f, "Steuerung:");
+                textAbstandY = drawText(spielfeldGegner, textAbstandY, 1.5f, "Mit Linksklick kannst du Schiffe auswählen und Setzen.");
+                textAbstandY = drawText(spielfeldGegner, textAbstandY, 1.5f, "Mit Rechtsklick kannst du das Schiff drehen.");
+                textAbstandY = drawText(spielfeldGegner, textAbstandY, 1.5f, "Setze bitte noch " + dreierSchiffe + ":Dreier, "+ zweierSchiffe +":Zweier und "+ einerSchiffe +":Einer setzen.");
+                drawText(spielfeldGegner, textAbstandY, 1.5f, "Wenn du die Schiffe plaziert hast, dann drücke 'K'");
+                textAbstandY = drawText(screenEdgeSize, screenEdgeSize + mapSize*tileSize, 1.5f, "Spielmodis:");
+                drawText(screenEdgeSize, textAbstandY, 1.5f, "Spieler vs KI = 'K'");
                 drawSchiffeSetzen(spieler, false);
-                if (einerSchiffe == 0 && zweierSchiffe == 0 && dreierSchiffe == 0 && gameMode != null) {
-                    einerSchiffe = -1;
-                    zweierSchiffe = -1;
-                    dreierSchiffe = -1;
-                    switch (gameMode) {
-                        case spielenGegenKi:
-                        case spielenGegenSpieler: {
+                if (einerSchiffe == 0 && zweierSchiffe == 0 && dreierSchiffe == 0 && pressedKey != '0') {
+                    switch (pressedKey) {
+                        case 'k': {
                             spielStatus = GameState.schiffeGegnerSetzen;
+                            gameMode = GameMode.spielenGegenKi;
+                            einerSchiffe = -1;
+                            zweierSchiffe = -1;
+                            dreierSchiffe = -1;
                             break;
                         }
                     }
@@ -170,9 +175,12 @@ public class Regie extends PApplet {
                         if (mouseLeftClick) {
                             break;
                         }
-                        int x = (int) gegner.ki().x;
-                        int y = (int) gegner.ki().y;
-                        if (spieler.shootAt(x, y)) {
+                        PVector shoot = gegner.ki(spieler.getOfficialMapKarte(), correctShoot);
+                        int x = (int) shoot.x;
+                        int y = (int) shoot.y;
+                        correctShoot = spieler.shootAt(x, y);
+                        System.out.println("shoot at " + correctShoot);
+                        if (correctShoot) {
                             spielStatus = GameState.spielerShoots;
                             if (spieler.noSchiffAlive()) {
                                 spielStatus = GameState.verloren;
@@ -349,4 +357,13 @@ public class Regie extends PApplet {
         mouseLeftClick = false;
     }
 
+    @Override
+    public void keyPressed() {
+        pressedKey = key;
+    }
+
+    @Override
+    public void keyReleased() {
+        pressedKey = 0;
+    }
 }
