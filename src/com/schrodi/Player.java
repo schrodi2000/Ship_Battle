@@ -8,6 +8,7 @@ import java.util.ArrayList;
 public class Player {
     public enum Zustand {
         aliveShip,
+        hitShip,
         deadShip,
         water,
         miss
@@ -141,11 +142,11 @@ public class Player {
         return true;
     }
 
-    public PVector ki(Zustand[][] map, boolean hitLast) {
+    public PVector ki(Zustand[][] map) {
         PVector shootAt = new PVector(-1, -1);
         for (int y = 0; y < map.length; y++) {
             for (int x = 0; x < map.length; x++) {
-                if (map[x][y] == Zustand.deadShip) {
+                if (map[x][y] == Zustand.hitShip) {
                     Random t = new Random();
                     try {
                         switch (t.nextInt(3)) {
@@ -188,6 +189,17 @@ public class Player {
             }
         }
         if (destroyed) {
+            if(schiff.getRichtung() == Schiff.Richtung.horizontal) {
+                for (int i = 0; i < schiff.getLaenge(); i++) {
+                    mapKarte[schiff.getX() + i][schiff.getY()] = Zustand.deadShip;
+                }
+            }
+            else {
+                for (int i = 0; i < schiff.getLaenge(); i++) {
+                    mapKarte[schiff.getX()][schiff.getY() + i] = Zustand.deadShip;
+                }
+            }
+
             schiffe.remove(schiff);
         }
     }
@@ -197,8 +209,9 @@ public class Player {
             if (schiff.getRichtung() == Schiff.Richtung.horizontal) {
                 for (int teilNr = 0; teilNr < schiff.getLaenge(); teilNr++) {
                     if (schiff.getX() + teilNr == x && schiff.getY() == y && schiff.getTeilZustand(teilNr) == Zustand.aliveShip) {
-                        mapKarte[x][y] = Zustand.deadShip;
-                        schiff.setTeilZustand(teilNr, Zustand.deadShip);
+                        mapKarte[x][y] = Zustand.hitShip;
+                        schiff.setTeilZustand(teilNr, Zustand.hitShip);
+
                         removeSchiff(schiff);
                         return true;
                     }
@@ -206,8 +219,8 @@ public class Player {
             } else {
                 for (int teilNr = 0; teilNr < schiff.getLaenge(); teilNr++) {
                     if (schiff.getX() == x && schiff.getY() + teilNr == y && schiff.getTeilZustand(teilNr) == Zustand.aliveShip) {
-                        mapKarte[x][y] = Zustand.deadShip;
-                        schiff.setTeilZustand(teilNr, Zustand.deadShip);
+                        mapKarte[x][y] = Zustand.hitShip;
+                        schiff.setTeilZustand(teilNr, Zustand.hitShip);
                         removeSchiff(schiff);
                         return true;
                     }
@@ -225,7 +238,6 @@ public class Player {
         Random random = new Random();
         int x;
         int y;
-        int i = 0;
         do {
             x = random.nextInt(mapSize);
             y = random.nextInt(mapSize);

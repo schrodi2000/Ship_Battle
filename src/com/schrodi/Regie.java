@@ -3,7 +3,7 @@ package com.schrodi;
 import processing.core.PApplet;
 import processing.core.PVector;
 
-import java.awt.*;
+import java.util.Random;
 
 public class Regie extends PApplet {
     public enum GameState {
@@ -19,7 +19,6 @@ public class Regie extends PApplet {
         spielenGegenSpieler,
         spielenAmPCGegenSpieler,
         spielenGegenKi,
-        kiGegenKi,
 
     }
 
@@ -76,7 +75,8 @@ public class Regie extends PApplet {
 
     public void setup() {
         surface.setResizable(true);
-        noStroke();
+        frameRate(15);
+        noStroke(); // Damit die Kästchen keine ränder haben.
     }
 
     // das ist die eigentliche Regie Funktion
@@ -250,7 +250,7 @@ public class Regie extends PApplet {
                         if (mouseLeftClick) {
                             break;
                         }
-                        PVector shoot = gegner.ki(spieler.getOfficialMapKarte(), correctShoot);
+                        PVector shoot = gegner.ki(spieler.getOfficialMapKarte());
                         int x = (int) shoot.x;
                         int y = (int) shoot.y;
                         correctShoot = spieler.shootAt(x, y);
@@ -308,21 +308,24 @@ public class Regie extends PApplet {
         boolean visible = player.isShipVisible();
         player.setShipVisible(shipsVisible);
         String buchstaben = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
+        Random random = new Random();
         for (int iy = 0; iy < mapSize; iy++) {
             for (int jx = 0; jx < mapSize; jx++) {
                 switch (player.getMapKarteTeil(jx, iy)) {
                     case water:
-                        fill(0, 0, 255);
+                        fill(0, 0, 180 + random.nextInt(15));
                         break;
                     case miss:
-                        fill(122, 122, 255);
+                        fill(122, 122, 180 + random.nextInt(15));
                         break;
-                    case deadShip:
-                        fill(255, 0, 0);
+                    case hitShip:
+                        fill(170 + random.nextInt(30), 0, 0);
                         break;
                     case aliveShip:
                         fill(0, 255, 0);
+                        break;
+                    case deadShip:
+                        fill(50, 0, 0);
                         break;
                 }
                 rect(mapPosX + jx * tileSize, screenEdgeSize + iy * tileSize, tileSize * tileVerkleinerungFaktor, tileSize * tileVerkleinerungFaktor);
@@ -342,23 +345,6 @@ public class Regie extends PApplet {
             }
             tilesPosX = tilesPosX + tileSize + infobereichAbstandTiles;
         }
-    }
-
-    void drawZustandSelect() {
-        float tilesPosY = screenEdgeSize;
-        float tilesPosX = infobereich + 2 * infobereichAbstandTiles + tileSize;
-        // Water
-        fill(0, 0, 255);
-        rect(tilesPosX, tilesPosY + 0 * tileSize, tileSize * tileVerkleinerungFaktor, tileSize * tileVerkleinerungFaktor);
-        // Miss
-        fill(122, 122, 255);
-        rect(tilesPosX, tilesPosY + 1 * tileSize, tileSize * tileVerkleinerungFaktor, tileSize * tileVerkleinerungFaktor);
-        // AliveShip
-        fill(0, 255, 0);
-        rect(tilesPosX, tilesPosY + 2 * tileSize, tileSize * tileVerkleinerungFaktor, tileSize * tileVerkleinerungFaktor);
-        // DeadShip
-        fill(255, 0, 0);
-        rect(tilesPosX, tilesPosY + 3 * tileSize, tileSize * tileVerkleinerungFaktor, tileSize * tileVerkleinerungFaktor);
     }
 
     void drawSchiffeSetzen(Player player, boolean enemy) {
@@ -394,7 +380,24 @@ public class Regie extends PApplet {
         }
     }
 
-    void selectZustand(){
+    void drawZustandSelect() {
+        float tilesPosY = screenEdgeSize;
+        float tilesPosX = infobereich + 2 * infobereichAbstandTiles + tileSize;
+        // Water
+        fill(0, 0, 255);
+        rect(tilesPosX, tilesPosY + 0 * tileSize, tileSize * tileVerkleinerungFaktor, tileSize * tileVerkleinerungFaktor);
+        // Miss
+        fill(122, 122, 255);
+        rect(tilesPosX, tilesPosY + 1 * tileSize, tileSize * tileVerkleinerungFaktor, tileSize * tileVerkleinerungFaktor);
+        // hitShip
+        fill(255, 0, 0);
+        rect(tilesPosX, tilesPosY + 2 * tileSize, tileSize * tileVerkleinerungFaktor, tileSize * tileVerkleinerungFaktor);
+        // DeadShip
+        fill(50, 0, 0);
+        rect(tilesPosX, tilesPosY + 3 * tileSize, tileSize * tileVerkleinerungFaktor, tileSize * tileVerkleinerungFaktor);
+    }
+
+    void selectZustand() {
 
         // Water
         if (fieldPressed(infobereich + 2 * infobereichAbstandTiles + tileSize, screenEdgeSize + 0 * tileSize, infobereich + 2 * infobereichAbstandTiles + 2 * tileSize, screenEdgeSize + 1 * tileSize)) {
@@ -404,14 +407,25 @@ public class Regie extends PApplet {
         else if (fieldPressed(infobereich + 2 * infobereichAbstandTiles + tileSize, screenEdgeSize + 1 * tileSize, infobereich + 2 * infobereichAbstandTiles + 2 * tileSize, screenEdgeSize + 2 * tileSize)) {
             selectedZustand = Player.Zustand.miss;
         }
-        // AliveShip
+        // hitShip
         else if (fieldPressed(infobereich + 2 * infobereichAbstandTiles + tileSize, screenEdgeSize + 2 * tileSize, infobereich + 2 * infobereichAbstandTiles + 2 * tileSize, screenEdgeSize + 3 * tileSize)) {
-            selectedZustand = Player.Zustand.aliveShip;
+            selectedZustand = Player.Zustand.hitShip;
         }
         // DeadShip
         else if (fieldPressed(infobereich + 2 * infobereichAbstandTiles + tileSize, screenEdgeSize + 3 * tileSize, infobereich + 2 * infobereichAbstandTiles + 2 * tileSize, screenEdgeSize + 4 * tileSize)) {
             selectedZustand = Player.Zustand.deadShip;
         }
+    }
+
+    // PVector ist eine Koordinate und dann kann ich "mouseOnMap.x" machen.
+    PVector mousePosOnMap(float mapPosX, float mapPosY) {
+        if (mouseX > mapPosX && mouseX < mapPosX + mapSize * tileSize && mouseY > mapPosY && mouseY < mapPosY + mapSize * tileSize) {
+            int tileOnMapX = (int) ((mouseX - mapPosX) / tileSize);
+            int tileOnMapY = (int) ((mouseY - mapPosY) / tileSize);
+            // ich kriege die Nummer des Teils also das wievielte es ist.
+            return new PVector(tileOnMapX, tileOnMapY);
+        }
+        return new PVector(-1, -1);
     }
 
     int selectShip() {
@@ -431,17 +445,6 @@ public class Regie extends PApplet {
         }
 
         return selectedShipLength;
-    }
-
-    // PVector ist eine Koordinate und dann kann ich "mouseOnMap.x" machen.
-    PVector mousePosOnMap(float mapPosX, float mapPosY) {
-        if (mouseX > mapPosX && mouseX < mapPosX + mapSize * tileSize && mouseY > mapPosY && mouseY < mapPosY + mapSize * tileSize) {
-            int tileOnMapX = (int) ((mouseX - mapPosX) / tileSize);
-            int tileOnMapY = (int) ((mouseY - mapPosY) / tileSize);
-            // ich kriege die Nummer des Teils also das wievielte es ist.
-            return new PVector(tileOnMapX, tileOnMapY);
-        }
-        return new PVector(-1, -1);
     }
 
     void drawSelectedShip(int selectedShip, float mapPosX, float mapPosY) {
@@ -494,12 +497,10 @@ public class Regie extends PApplet {
         mouseLeftClick = false;
     }
 
-    @Override
     public void keyPressed() {
         pressedKey = key;
     }
 
-    @Override
     public void keyReleased() {
         pressedKey = 0;
     }

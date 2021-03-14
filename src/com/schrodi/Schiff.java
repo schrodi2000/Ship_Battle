@@ -6,10 +6,10 @@ public class Schiff {
         vertikal
     }
 
-    private int laenge;
-    private Player.Zustand[] teile;
-    private int x, y;
-    private Richtung richtung;
+    private final int laenge;
+    private final Player.Zustand[] teile;
+    private final int x, y;
+    private final Richtung richtung;
 
 
     public Schiff(int laenge, int x, int y, Richtung richtung) {// Konstruktor
@@ -46,10 +46,4 @@ public class Schiff {
     public int getLaenge() {
         return laenge;
     }
-
-    public void kill(int teilNr) {
-        teile[teilNr] = Player.Zustand.deadShip;
-    }
-
-
 }
