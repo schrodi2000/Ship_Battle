@@ -15,7 +15,7 @@ public class Player {
 
     public final ArrayList<Schiff> schiffe;
     private final int mapSize;
-    private final Zustand[][] mapKarte;
+    public final Zustand[][] mapKarte;
     private boolean shipVisible;
 
     public Zustand[][] getOfficialMapKarte() {
@@ -56,11 +56,11 @@ public class Player {
         Schiff schiff = new Schiff(length, x, y, richtung);// Erstellt ein Schiff mit den eigenschaften
         if (addAbleSchiff(schiff)) {
             if (schiff.getRichtung() == Schiff.Richtung.horizontal) {
-                for (int i = 0; i < schiff.getLänge(); i++) {// Trägt die Teile des Schiffes ein wenn es Horizontal ausgerichtet ist
+                for (int i = 0; i < schiff.getLaenge(); i++) {// Trägt die Teile des Schiffes ein wenn es Horizontal ausgerichtet ist
                     mapKarte[x + i][y] = schiff.getTeilZustand(i);
                 }
             } else {
-                for (int i = 0; i < schiff.getLänge(); i++) {// Trägt die Teile des Schiffes ein wenn es Vertikal ausgerichtet ist
+                for (int i = 0; i < schiff.getLaenge(); i++) {// Trägt die Teile des Schiffes ein wenn es Vertikal ausgerichtet ist
                     mapKarte[x][y + i] = schiff.getTeilZustand(i);
                 }
             }
@@ -73,7 +73,7 @@ public class Player {
 
     boolean addAbleSchiff(Schiff schiff) {
         try {
-            for (int i = 0; i < schiff.getLänge(); i++) {
+            for (int i = 0; i < schiff.getLaenge(); i++) {
                 if (schiff.getRichtung() == Schiff.Richtung.horizontal) {//Horizontale Schiffe
                     if (mapKarte[schiff.getX() + i][schiff.getY()] == Zustand.aliveShip) {// schiff darf nicht auf anderes schiff gesetzt werden
                         return false;
@@ -83,8 +83,8 @@ public class Player {
                             return false;
                         }
                     }
-                    if (schiff.getX() + schiff.getLänge() < mapSize) {
-                        if (mapKarte[schiff.getX() + schiff.getLänge()][schiff.getY()] == Zustand.aliveShip) {// rechts vom schiff darf kein anderes Schiff stehen
+                    if (schiff.getX() + schiff.getLaenge() < mapSize) {
+                        if (mapKarte[schiff.getX() + schiff.getLaenge()][schiff.getY()] == Zustand.aliveShip) {// rechts vom schiff darf kein anderes Schiff stehen
                             return false;
                         }
                     }
@@ -117,8 +117,8 @@ public class Player {
                             return false;
                         }
                     }
-                    if (schiff.getY() + schiff.getLänge() < mapSize) {
-                        if (mapKarte[schiff.getX()][schiff.getY() + schiff.getLänge()] == Zustand.aliveShip) {// unter dem schiff darf kein anderes Schiff stehen
+                    if (schiff.getY() + schiff.getLaenge() < mapSize) {
+                        if (mapKarte[schiff.getX()][schiff.getY() + schiff.getLaenge()] == Zustand.aliveShip) {// unter dem schiff darf kein anderes Schiff stehen
                             return false;
                         }
                     }
@@ -132,7 +132,7 @@ public class Player {
 
     public boolean noSchiffAlive() {
         for (Schiff schiff : schiffe) {
-            for (int i = 0; i < schiff.getLänge(); i++) {
+            for (int i = 0; i < schiff.getLaenge(); i++) {
                 if (schiff.getTeilZustand(i) == Zustand.aliveShip) {
                     return false;
                 }
@@ -170,7 +170,7 @@ public class Player {
                                 }
                                 break;
                         }
-                    }catch (Exception e){}
+                    }catch (Exception ignored){}
                 }
             }
         }
@@ -182,7 +182,7 @@ public class Player {
 
     public void removeSchiff(Schiff schiff) {
         boolean destroyed = true;
-        for (int i = 0; i < schiff.getLänge(); i++) {
+        for (int i = 0; i < schiff.getLaenge(); i++) {
             if (schiff.getTeilZustand(i) == Zustand.aliveShip) {
                 destroyed = false;
             }
@@ -195,7 +195,7 @@ public class Player {
     public boolean shootAt(int x, int y) {
         for (Schiff schiff : schiffe) {
             if (schiff.getRichtung() == Schiff.Richtung.horizontal) {
-                for (int teilNr = 0; teilNr < schiff.getLänge(); teilNr++) {
+                for (int teilNr = 0; teilNr < schiff.getLaenge(); teilNr++) {
                     if (schiff.getX() + teilNr == x && schiff.getY() == y && schiff.getTeilZustand(teilNr) == Zustand.aliveShip) {
                         mapKarte[x][y] = Zustand.deadShip;
                         schiff.setTeilZustand(teilNr, Zustand.deadShip);
@@ -204,7 +204,7 @@ public class Player {
                     }
                 }
             } else {
-                for (int teilNr = 0; teilNr < schiff.getLänge(); teilNr++) {
+                for (int teilNr = 0; teilNr < schiff.getLaenge(); teilNr++) {
                     if (schiff.getX() == x && schiff.getY() + teilNr == y && schiff.getTeilZustand(teilNr) == Zustand.aliveShip) {
                         mapKarte[x][y] = Zustand.deadShip;
                         schiff.setTeilZustand(teilNr, Zustand.deadShip);

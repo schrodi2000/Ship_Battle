@@ -6,29 +6,28 @@ public class Schiff {
         vertikal
     }
 
-    private int länge;
+    private int laenge;
     private Player.Zustand[] teile;
     private int x, y;
     private Richtung richtung;
 
 
-    public Schiff(int länge, int x, int y, Richtung richtung) {
-        teile = new Player.Zustand[länge];
-        this.länge = länge;
+    public Schiff(int laenge, int x, int y, Richtung richtung) {// Konstruktor
+        teile = new Player.Zustand[laenge];
+        this.laenge = laenge;
         this.x = x;
         this.y = y;
         this.richtung = richtung;
-        for (int i = 0; i < länge; i++) {
+        for (int i = 0; i < laenge; i++) {
             teile[i] = Player.Zustand.aliveShip;
         }
     }
 
-    public Player.Zustand getTeilZustand(int teilNr) {
-        Player.Zustand teilZustand = teile[teilNr];
-        return teilZustand;
+    public Player.Zustand getTeilZustand(int teilNr) { //gibt den zustand eines Schiffteils zurück
+        return teile[teilNr];
     }
 
-    public void setTeilZustand(int teilNr, Player.Zustand zustand) {
+    public void setTeilZustand(int teilNr, Player.Zustand zustand) { //setzt den Zustand eines Schiffteils
         teile[teilNr] = zustand;
     }
 
@@ -44,8 +43,8 @@ public class Schiff {
         return richtung;
     }
 
-    public int getLänge() {
-        return länge;
+    public int getLaenge() {
+        return laenge;
     }
 
     public void kill(int teilNr) {

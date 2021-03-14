@@ -3,6 +3,8 @@ package com.schrodi;
 import processing.core.PApplet;
 import processing.core.PVector;
 
+import java.awt.*;
+
 public class Regie extends PApplet {
     public enum GameState {
         schiffeSetzen,
@@ -15,7 +17,7 @@ public class Regie extends PApplet {
 
     public enum GameMode {
         spielenGegenSpieler,
-        spielenGegenOnline,
+        spielenAmPCGegenSpieler,
         spielenGegenKi,
         kiGegenKi,
 
@@ -41,6 +43,7 @@ public class Regie extends PApplet {
     Player gegner;
     char pressedKey = 0;
     boolean correctShoot = false;
+    Player.Zustand selectedZustand = Player.Zustand.water;
 
 
     public Regie() {
@@ -76,11 +79,12 @@ public class Regie extends PApplet {
         noStroke();
     }
 
+    // das ist die eigentliche Regie Funktion
     public void draw() {
         updateLayout();
         background(100, 100, 100);
         spielAblauf(spieler, gegner);
-    } // das ist die eigentliche Regie Funktion
+    }
 
     void updateLayout() {
         screenEdgeSize = width * 0.1f;
@@ -101,7 +105,9 @@ public class Regie extends PApplet {
                 textAbstandY = drawText(spielfeldGegner, textAbstandY, 1.5f, "Setze bitte noch " + dreierSchiffe + ":Dreier, " + zweierSchiffe + ":Zweier und " + einerSchiffe + ":Einer setzen.");
                 drawText(spielfeldGegner, textAbstandY, 1.5f, "Wenn du die Schiffe plaziert hast, dann drücke 'K'");
                 textAbstandY = drawText(screenEdgeSize, screenEdgeSize + mapSize * tileSize, 1.5f, "Spielmodis:");
-                drawText(screenEdgeSize, textAbstandY, 1.5f, "Spieler vs KI = 'K'");
+                textAbstandY = drawText(screenEdgeSize, textAbstandY, 1.5f, "Spieler gegen KI: 'K'");
+                textAbstandY = drawText(screenEdgeSize, textAbstandY, 1.5f, "Spieler gegen anderen Spieler: 'S'");
+                drawText(screenEdgeSize, textAbstandY, 1.5f, "Spieler gegen Spieler an eime PC 'P'");
                 drawSchiffeSetzen(spieler, false);
                 if (einerSchiffe == 0 && zweierSchiffe == 0 && dreierSchiffe == 0 && pressedKey != '0') {
                     switch (pressedKey) {
@@ -111,6 +117,25 @@ public class Regie extends PApplet {
                             einerSchiffe = -1;
                             zweierSchiffe = -1;
                             dreierSchiffe = -1;
+                            System.out.println("K");
+                            break;
+                        }
+                        case 's': {
+                            spielStatus = GameState.spielerShoots;
+                            gameMode = GameMode.spielenGegenSpieler;
+                            einerSchiffe = -1;
+                            zweierSchiffe = -1;
+                            dreierSchiffe = -1;
+                            System.out.println("S");
+                            break;
+                        }
+                        case 'p': {
+                            spielStatus = GameState.schiffeGegnerSetzen;
+                            gameMode = GameMode.spielenAmPCGegenSpieler;
+                            einerSchiffe = -1;
+                            zweierSchiffe = -1;
+                            dreierSchiffe = -1;
+                            System.out.println("P");
                             break;
                         }
                     }
@@ -119,7 +144,7 @@ public class Regie extends PApplet {
             }
             case schiffeGegnerSetzen: {
                 switch (gameMode) {
-                    case spielenGegenSpieler: {
+                    case spielenAmPCGegenSpieler: {
                         if (einerSchiffe == -1 && zweierSchiffe == -1 && dreierSchiffe == -1) {
                             einerSchiffe = 3;
                             zweierSchiffe = 2;
@@ -150,20 +175,70 @@ public class Regie extends PApplet {
                 break;
             }
             case spielerShoots: {
-                drawMap(spieler, false, true);
-                drawMap(gegner, true, false);
+                switch (gameMode) {
+                    case spielenGegenKi: {
+                        drawMap(spieler, false, true);
+                        drawMap(gegner, true, false);
 
-                if (mousePosOnMap(spielfeldGegner, screenEdgeSize).x != -1) {
-                    int x = (int) mousePosOnMap(spielfeldGegner, screenEdgeSize).x;
-                    int y = (int) mousePosOnMap(spielfeldGegner, screenEdgeSize).y;
-                    if (mouseLeftClick) {
-                        if (gegner.shootAt(x, y)) {
-                            spielStatus = GameState.gegnerShoots;
-                            if (gegner.noSchiffAlive()) {
-                                spielStatus = GameState.gewonnen;
+                        if (mousePosOnMap(spielfeldGegner, screenEdgeSize).x != -1) {
+                            int x = (int) mousePosOnMap(spielfeldGegner, screenEdgeSize).x;
+                            int y = (int) mousePosOnMap(spielfeldGegner, screenEdgeSize).y;
+                            if (mouseLeftClick) {
+                                if (gegner.shootAt(x, y)) {
+                                    spielStatus = GameState.gegnerShoots;
+                                    if (gegner.noSchiffAlive()) {
+                                        spielStatus = GameState.gewonnen;
+                                    }
+                                }
                             }
                         }
+                        break;
                     }
+                    case spielenAmPCGegenSpieler: {
+                        drawMap(spieler, false, false);
+                        drawMap(gegner, true, false);
+
+                        if (mousePosOnMap(spielfeldGegner, screenEdgeSize).x != -1) {
+                            int x = (int) mousePosOnMap(spielfeldGegner, screenEdgeSize).x;
+                            int y = (int) mousePosOnMap(spielfeldGegner, screenEdgeSize).y;
+                            if (mouseLeftClick) {
+                                if (gegner.shootAt(x, y)) {
+                                    spielStatus = GameState.gegnerShoots;
+                                    if (gegner.noSchiffAlive()) {
+                                        spielStatus = GameState.gewonnen;
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    }
+                    case spielenGegenSpieler: {
+                        drawMap(spieler, false, true);
+                        drawMap(gegner, true, true);
+                        drawZustandSelect();
+                        selectZustand();
+                        if (mousePosOnMap(spielfeldGegner, screenEdgeSize).x != -1) {
+                            int x = (int) mousePosOnMap(spielfeldGegner, screenEdgeSize).x;
+                            int y = (int) mousePosOnMap(spielfeldGegner, screenEdgeSize).y;
+
+                            if (mouseLeftClick) {
+                                coloringMap(x, y, gegner, selectedZustand);
+                            }
+                        }
+                        if (mousePosOnMap(screenEdgeSize, screenEdgeSize).x != -1) {
+                            int x = (int) mousePosOnMap(screenEdgeSize, screenEdgeSize).x;
+                            int y = (int) mousePosOnMap(screenEdgeSize, screenEdgeSize).y;
+                            if (mouseLeftClick) {
+                                if (spieler.shootAt(x, y)) {
+                                    if (spieler.noSchiffAlive()) {
+                                        spielStatus = GameState.verloren;
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    }
+
                 }
                 break;
             }
@@ -179,11 +254,28 @@ public class Regie extends PApplet {
                         int x = (int) shoot.x;
                         int y = (int) shoot.y;
                         correctShoot = spieler.shootAt(x, y);
-                        System.out.println("shoot at " + correctShoot);
                         if (correctShoot) {
                             spielStatus = GameState.spielerShoots;
                             if (spieler.noSchiffAlive()) {
                                 spielStatus = GameState.verloren;
+                            }
+                        }
+                        break;
+                    }
+                    case spielenAmPCGegenSpieler: {
+                        drawMap(spieler, false, false);
+                        drawMap(gegner, true, false);
+
+                        if (mousePosOnMap(spielfeldGegner, screenEdgeSize).x != -1) {
+                            int x = (int) mousePosOnMap(spielfeldGegner, screenEdgeSize).x;
+                            int y = (int) mousePosOnMap(spielfeldGegner, screenEdgeSize).y;
+                            if (mouseLeftClick) {
+                                if (gegner.shootAt(x, y)) {
+                                    spielStatus = GameState.gegnerShoots;
+                                    if (gegner.noSchiffAlive()) {
+                                        spielStatus = GameState.gewonnen;
+                                    }
+                                }
                             }
                         }
                         break;
@@ -200,6 +292,10 @@ public class Regie extends PApplet {
                 break;
             }
         }
+    }
+
+    void coloringMap(int x, int y, Player gegner, Player.Zustand selectedZustand) {
+        gegner.mapKarte[x][y] = selectedZustand;
     }
 
     void drawMap(Player player, Boolean isEnemy, boolean shipsVisible) {
@@ -248,6 +344,23 @@ public class Regie extends PApplet {
         }
     }
 
+    void drawZustandSelect() {
+        float tilesPosY = screenEdgeSize;
+        float tilesPosX = infobereich + 2 * infobereichAbstandTiles + tileSize;
+        // Water
+        fill(0, 0, 255);
+        rect(tilesPosX, tilesPosY + 0 * tileSize, tileSize * tileVerkleinerungFaktor, tileSize * tileVerkleinerungFaktor);
+        // Miss
+        fill(122, 122, 255);
+        rect(tilesPosX, tilesPosY + 1 * tileSize, tileSize * tileVerkleinerungFaktor, tileSize * tileVerkleinerungFaktor);
+        // AliveShip
+        fill(0, 255, 0);
+        rect(tilesPosX, tilesPosY + 2 * tileSize, tileSize * tileVerkleinerungFaktor, tileSize * tileVerkleinerungFaktor);
+        // DeadShip
+        fill(255, 0, 0);
+        rect(tilesPosX, tilesPosY + 3 * tileSize, tileSize * tileVerkleinerungFaktor, tileSize * tileVerkleinerungFaktor);
+    }
+
     void drawSchiffeSetzen(Player player, boolean enemy) {
         float mapPosX;
         if (enemy) {
@@ -281,6 +394,26 @@ public class Regie extends PApplet {
         }
     }
 
+    void selectZustand(){
+
+        // Water
+        if (fieldPressed(infobereich + 2 * infobereichAbstandTiles + tileSize, screenEdgeSize + 0 * tileSize, infobereich + 2 * infobereichAbstandTiles + 2 * tileSize, screenEdgeSize + 1 * tileSize)) {
+            selectedZustand = Player.Zustand.water;
+        }
+        // Miss
+        else if (fieldPressed(infobereich + 2 * infobereichAbstandTiles + tileSize, screenEdgeSize + 1 * tileSize, infobereich + 2 * infobereichAbstandTiles + 2 * tileSize, screenEdgeSize + 2 * tileSize)) {
+            selectedZustand = Player.Zustand.miss;
+        }
+        // AliveShip
+        else if (fieldPressed(infobereich + 2 * infobereichAbstandTiles + tileSize, screenEdgeSize + 2 * tileSize, infobereich + 2 * infobereichAbstandTiles + 2 * tileSize, screenEdgeSize + 3 * tileSize)) {
+            selectedZustand = Player.Zustand.aliveShip;
+        }
+        // DeadShip
+        else if (fieldPressed(infobereich + 2 * infobereichAbstandTiles + tileSize, screenEdgeSize + 3 * tileSize, infobereich + 2 * infobereichAbstandTiles + 2 * tileSize, screenEdgeSize + 4 * tileSize)) {
+            selectedZustand = Player.Zustand.deadShip;
+        }
+    }
+
     int selectShip() {
         //schiff 3
         if (fieldPressed(infobereich + infobereichAbstandTiles, screenEdgeSize, infobereich + infobereichAbstandTiles + tileSize, screenEdgeSize + 3 * tileSize)) {
@@ -300,6 +433,7 @@ public class Regie extends PApplet {
         return selectedShipLength;
     }
 
+    // PVector ist eine Koordinate und dann kann ich "mouseOnMap.x" machen.
     PVector mousePosOnMap(float mapPosX, float mapPosY) {
         if (mouseX > mapPosX && mouseX < mapPosX + mapSize * tileSize && mouseY > mapPosY && mouseY < mapPosY + mapSize * tileSize) {
             int tileOnMapX = (int) ((mouseX - mapPosX) / tileSize);
@@ -308,7 +442,7 @@ public class Regie extends PApplet {
             return new PVector(tileOnMapX, tileOnMapY);
         }
         return new PVector(-1, -1);
-    } // PVector ist eine Koordinate und dann kann ich "mouseOnMap.x" machen.
+    }
 
     void drawSelectedShip(int selectedShip, float mapPosX, float mapPosY) {
         float mouseOnMapX = mousePosOnMap(mapPosX, mapPosY).x;
