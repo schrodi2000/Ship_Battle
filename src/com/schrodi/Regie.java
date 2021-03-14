@@ -98,9 +98,9 @@ public class Regie extends PApplet {
                 float textAbstandY = drawText(spielfeldGegner, screenEdgeSize, 2.5f, "Steuerung:");
                 textAbstandY = drawText(spielfeldGegner, textAbstandY, 1.5f, "Mit Linksklick kannst du Schiffe auswählen und Setzen.");
                 textAbstandY = drawText(spielfeldGegner, textAbstandY, 1.5f, "Mit Rechtsklick kannst du das Schiff drehen.");
-                textAbstandY = drawText(spielfeldGegner, textAbstandY, 1.5f, "Setze bitte noch " + dreierSchiffe + ":Dreier, "+ zweierSchiffe +":Zweier und "+ einerSchiffe +":Einer setzen.");
+                textAbstandY = drawText(spielfeldGegner, textAbstandY, 1.5f, "Setze bitte noch " + dreierSchiffe + ":Dreier, " + zweierSchiffe + ":Zweier und " + einerSchiffe + ":Einer setzen.");
                 drawText(spielfeldGegner, textAbstandY, 1.5f, "Wenn du die Schiffe plaziert hast, dann drücke 'K'");
-                textAbstandY = drawText(screenEdgeSize, screenEdgeSize + mapSize*tileSize, 1.5f, "Spielmodis:");
+                textAbstandY = drawText(screenEdgeSize, screenEdgeSize + mapSize * tileSize, 1.5f, "Spielmodis:");
                 drawText(screenEdgeSize, textAbstandY, 1.5f, "Spieler vs KI = 'K'");
                 drawSchiffeSetzen(spieler, false);
                 if (einerSchiffe == 0 && zweierSchiffe == 0 && dreierSchiffe == 0 && pressedKey != '0') {
@@ -211,6 +211,8 @@ public class Regie extends PApplet {
         }
         boolean visible = player.isShipVisible();
         player.setShipVisible(shipsVisible);
+        String buchstaben = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
         for (int iy = 0; iy < mapSize; iy++) {
             for (int jx = 0; jx < mapSize; jx++) {
                 switch (player.getMapKarteTeil(jx, iy)) {
@@ -228,6 +230,7 @@ public class Regie extends PApplet {
                         break;
                 }
                 rect(mapPosX + jx * tileSize, screenEdgeSize + iy * tileSize, tileSize * tileVerkleinerungFaktor, tileSize * tileVerkleinerungFaktor);
+                drawText(mapPosX + jx * tileSize, screenEdgeSize + iy * tileSize, 1.5f, "" + buchstaben.charAt(iy) + (jx + 1));
             }
         }
         player.setShipVisible(visible);
